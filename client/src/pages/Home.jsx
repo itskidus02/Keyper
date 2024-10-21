@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import React from 'react';
 
 export default function Home() {
@@ -12,7 +13,7 @@ export default function Home() {
         allow users to sign up, log in, and log out, and provides access to
         protected routes only for authenticated users.
       </p>
-   
+   <Button>dfghj</Button>
     </div>
   );
 }
