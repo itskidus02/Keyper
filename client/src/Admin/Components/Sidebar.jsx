@@ -5,6 +5,7 @@ import { Folder, Lock, Plus, Settings, ShieldCheck, Wrench, ChevronLeft, Chevron
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = React.useState(true)
@@ -47,17 +48,36 @@ export default function Sidebar() {
           </Button>
         </div>
 
-        <Collapsible defaultOpen>
+        <Collapsible >
           <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
             <div className="flex items-center">
               <Vault className="mr-2" />
               {isExpanded && <span>Vaults</span>}
             </div>
-            {isExpanded && <Plus className="h-4 w-4" />}
+            {isExpanded && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button size="icon" variant="ghost">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-4">
+                  <div className="flex h-3 items-center space-x-2">
+                    <Input
+                      placeholder="New Vault Name"
+                      value={newVaultName}
+                      onChange={(e) => setNewVaultName(e.target.value)}
+                      className="text-sm h-2"
+                    />
+                    <Button size="sm" onClick={addVault}>Add</Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
           </CollapsibleTrigger>
           <CollapsibleContent>
             {isExpanded && (
-              <div className="pl-4 mt-2 text-xs">
+              <div className="pl-4 mt- text-xs">
                 {vaults.map(vault => (
                   <Collapsible key={vault.id}>
                     <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
@@ -65,7 +85,6 @@ export default function Sidebar() {
                         <Folder className="mr-2 h-4 w-4" />
                         <span>{vault.name}</span>
                       </div>
-                     
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <ul className="pl-6 mt-1 space-y-1">
@@ -79,17 +98,6 @@ export default function Sidebar() {
                     </CollapsibleContent>
                   </Collapsible>
                 ))}
-              </div>
-            )}
-            {isExpanded && (
-              <div className="pl-4 mt-2 flex items-center space-x-2">
-                <Input
-                  placeholder="New Vault Name"
-                  value={newVaultName}
-                  onChange={(e) => setNewVaultName(e.target.value)}
-                  className="text-sm"
-                />
-                <Button size="sm" onClick={addVault}>Add</Button>
               </div>
             )}
           </CollapsibleContent>
@@ -118,7 +126,7 @@ export default function Sidebar() {
           </CollapsibleContent>
         </Collapsible>
 
-        <Collapsible className="mt-">
+        <Collapsible className="">
           <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
             <div className="flex items-center">
               <Settings className="mr-2" />
