@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import SignIn from "./pages/SignIn";
@@ -8,11 +8,15 @@ import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminLayout from "./Admin/AdminLayout";
 
-export default function App() {
+function App() {
+  const location = useLocation();
+
+  // Check if the current route starts with /admin
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
-    <BrowserRouter>
-      {/* header */}
-      <Header />
+    <>
+      {!isAdminRoute && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -21,20 +25,16 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
         </Route>
-
-        <Route path="/admin" element={<AdminLayout />}>
-
-        </Route>
-
-
-
-
-
-
-
-
-
+        <Route path="/admin/*" element={<AdminLayout />} />
       </Routes>
+    </>
+  );
+}
+
+export default function Root() {
+  return (
+    <BrowserRouter>
+      <App />
     </BrowserRouter>
   );
 }

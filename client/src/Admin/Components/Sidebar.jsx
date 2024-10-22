@@ -1,149 +1,37 @@
-'use client'
 
-import * as React from 'react'
-import { Folder, Lock, Plus, Settings, ShieldCheck, Wrench, ChevronLeft, ChevronRight, Vault } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+
+
+import { AppSidebar } from "@/components/app-sidebar"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 
 export default function Sidebar() {
-  const [isExpanded, setIsExpanded] = React.useState(true)
-  const [vaults, setVaults] = React.useState([
-    { id: 1, name: 'Personal', items: ['Email', 'Banking', 'Social Media'] },
-    { id: 2, name: 'Work', items: ['Company Accounts', 'Project Logins'] },
-  ])
-  const [newVaultName, setNewVaultName] = React.useState('')
-
-  const addVault = () => {
-    if (newVaultName.trim()) {
-      setVaults([...vaults, { id: Date.now(), name: newVaultName, items: [] }])
-      setNewVaultName('')
-    }
-  }
-
-  const addVaultItem = (vaultId) => {
-    const updatedVaults = vaults.map(vault => {
-      if (vault.id === vaultId) {
-        return { ...vault, items: [...vault.items, `New Password ${vault.items.length + 1}`] }
-      }
-      return vault
-    })
-    setVaults(updatedVaults)
-  }
-
   return (
-    <div className={`h-screen bg-background border-r transition-all duration-300 flex ${isExpanded ? 'w-48' : 'w-16'}`}>
-      <div className={`flex flex-col flex-grow overflow-y-auto ${isExpanded ? 'p-2' : 'p-2'}`}>
-        {/* Header with Password Manager Text and Collapse Button */}
-        <div className="flex items-center justify-between mb-4">
-          {isExpanded && <h1 className="text-xl font-bold">Lockbox</h1>}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="bg-background border border-input"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          </Button>
-        </div>
-
-        <Collapsible >
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
-            <div className="flex items-center">
-              <Vault className="mr-2" />
-              {isExpanded && <span>Vaults</span>}
-            </div>
-            {isExpanded && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button size="icon" variant="ghost">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-4">
-                  <div className="flex h-3 items-center space-x-2">
-                    <Input
-                      placeholder="New Vault Name"
-                      value={newVaultName}
-                      onChange={(e) => setNewVaultName(e.target.value)}
-                      className="text-sm h-2"
-                    />
-                    <Button size="sm" onClick={addVault}>Add</Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            {isExpanded && (
-              <div className="pl-4 mt- text-xs">
-                {vaults.map(vault => (
-                  <Collapsible key={vault.id}>
-                    <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
-                      <div className="flex items-center">
-                        <Folder className="mr-2 h-4 w-4" />
-                        <span>{vault.name}</span>
-                      </div>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <ul className="pl-6 mt-1 space-y-1">
-                        {vault.items.map((item, index) => (
-                          <li key={index} className="text-sm flex items-center space-x-2">
-                            <Lock className="h-3 w-3" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CollapsibleContent>
-                  </Collapsible>
-                ))}
-              </div>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
-
-        <Collapsible className="mt-">
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
-            <div className="flex items-center">
-              <Wrench className="mr-2" />
-              {isExpanded && <span>Tools</span>}
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            {isExpanded && (
-              <ul className="pl-4 text-xs mt-1 mb-2 space-y-2">
-                <li className="flex items-center space-x-2">
-                  <Lock className="h-4 w-4" />
-                  <span>Password Generator</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <ShieldCheck className="h-4 w-4" />
-                  <span>Password Health Checker</span>
-                </li>
-              </ul>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
-
-        <Collapsible className="">
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
-            <div className="flex items-center">
-              <Settings className="mr-2" />
-              {isExpanded && <span>Settings</span>}
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            {isExpanded && (
-              <ul className="pl-4 mt-2 space-y-2">
-                <li>Account</li>
-                <li>Security</li>
-                <li>Preferences</li>
-              </ul>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
-    </div>
-  )
+    (<SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header
+          className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+          
+          </div>
+        </header>
+     
+      </SidebarInset>
+    </SidebarProvider>)
+  );
 }
