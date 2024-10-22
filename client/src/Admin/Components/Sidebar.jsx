@@ -16,6 +16,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import PassGen from "../Pages/PassGen";
 
 export default function Sidebar() {
   return (
@@ -30,7 +31,7 @@ export default function Sidebar() {
           
           </div>
         </header>
-     
+     <PassGen/>
       </SidebarInset>
     </SidebarProvider>)
   );

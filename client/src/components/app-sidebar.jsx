@@ -37,17 +37,9 @@ const data = {
       name: "LockBox",
       logo: logo,
       plan: "Enterprise",
+      url : '/'
     },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
+   
   ],
   navMain: [
     {
@@ -77,11 +69,11 @@ const data = {
       items: [
         {
           title: "Password Generator",
-          url: "#",
+          url: "/admin/passgen",
         },
         {
           title: "Password health",
-          url: "#",
+          url: "/admin/passhealth",
         },
       ],
     },

@@ -7,6 +7,8 @@ import Profile from "./pages/Profile";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminLayout from "./Admin/AdminLayout";
+import PassGen from "./Admin/Pages/PassGen";
+import PassHealth from "./Admin/Pages/PassHealth";
 
 function App() {
   const location = useLocation();
@@ -24,8 +26,14 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="passgen" element={<PassGen />} />
+            <Route path="passhealth" element={<PassHealth />} />
+            
+          </Route>
         </Route>
-        <Route path="/admin/*" element={<AdminLayout />} />
       </Routes>
     </>
   );
