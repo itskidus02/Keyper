@@ -84,21 +84,10 @@ const data = {
       icon: Settings2,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "profile",
+          url: "/admin/profile",
         },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
+     
       ],
     },
   ],
