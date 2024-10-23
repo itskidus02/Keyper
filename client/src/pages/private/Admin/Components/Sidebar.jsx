@@ -24,7 +24,7 @@ export default function Sidebar() {
 
         {/* The Outlet will display the selected component */}
         <div className="flex mt-9 flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="ring p-4 rounded-lg">
+          <div className=" p-4 rounded-lg">
             <Outlet />
           </div>
         </div>
