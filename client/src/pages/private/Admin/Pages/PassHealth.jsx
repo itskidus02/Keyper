@@ -2,7 +2,7 @@ import React from 'react'
 
 const PassHealth = () => {
   return (
-    <div>PassHealth</div>
+    <div className='p-8 text-9xl flex'>PassHealth</div>
   )
 }
 

@@ -2,7 +2,7 @@ import React from 'react'
 
 const PassGen = () => {
   return (
-    <div className=''>PassGen</div>
+    <div className='p-8 text-9xl flex'>Password generator</div>
   )
 }
 
