@@ -1,40 +1,31 @@
-// import * as React from "react"
+import React, { useState, useEffect } from "react"; // Make sure to import useState and useEffect
+import axios from "axios";
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-  Vault,
   Wrench,
+  Settings2,
+  Vault,
   Plus,
-} from "lucide-react"
-import logo from "../assets/images/logo.png"
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+} from "lucide-react";
+import logo from "../assets/images/logo.png";
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
+import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import React, { useState, useEffect } from "react"; // Make sure to import useState and useEffect
-import axios from "axios";
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // This is sample data.
 export function AppSidebar({ ...props }) {
@@ -89,7 +80,9 @@ export function AppSidebar({ ...props }) {
   useEffect(() => {
     const fetchVaults = async () => {
       try {
-        const response = await axios.get("/api/vaults/get");
+        const response = await axios.get("/api/vaults/get", {
+          withCredentials: true, // Ensure cookies are sent with request
+        });
         const vaults = response.data.map((vault) => ({
           title: vault.name,
           url: `#${vault.name.toLowerCase().replace(/\s+/g, "-")}`,
@@ -118,7 +111,9 @@ export function AppSidebar({ ...props }) {
     if (newVaultName.trim()) {
       try {
         // Create the vault in the backend
-        await axios.post("/api/vaults/create", { name: newVaultName });
+        await axios.post("/api/vaults/create", { name: newVaultName }, {
+          withCredentials: true,
+        });
 
         // Update the sidebar UI
         const updatedNavMain = [...data.navMain];
