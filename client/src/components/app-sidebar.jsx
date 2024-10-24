@@ -6,6 +6,7 @@ import {
   Settings2,
   Vault,
   Plus,
+  Trash,
 } from "lucide-react";
 import logo from "../assets/images/logo.png";
 import { NavMain } from "@/components/nav-main";
@@ -84,6 +85,7 @@ export function AppSidebar({ ...props }) {
           withCredentials: true, // Ensure cookies are sent with request
         });
         const vaults = response.data.map((vault) => ({
+          id: vault._id, // Assuming vault has an _id field in the backend
           title: vault.name,
           url: `#${vault.name.toLowerCase().replace(/\s+/g, "-")}`,
         }));
@@ -106,12 +108,32 @@ export function AppSidebar({ ...props }) {
     fetchVaults();
   }, []);
 
+  // Handle deletion of a vault
+  const handleDeleteVault = async (vaultId) => {
+    try {
+      // Send a delete request to the server
+      await axios.delete(`/api/vaults/delete/${vaultId}`, {
+        withCredentials: true,
+      });
+
+      // Remove the vault from the UI after deletion
+      const updatedNavMain = [...data.navMain];
+      const vaultsIndex = updatedNavMain.findIndex(item => item.title === "Vaults");
+      if (vaultsIndex !== -1) {
+        updatedNavMain[vaultsIndex].items = updatedNavMain[vaultsIndex].items.filter(vault => vault.id !== vaultId);
+      }
+      setData({ ...data, navMain: updatedNavMain });
+    } catch (error) {
+      console.error("Error deleting vault:", error);
+    }
+  };
+
   const handleNewVault = async (e) => {
     e.preventDefault();
     if (newVaultName.trim()) {
       try {
         // Create the vault in the backend
-        await axios.post("/api/vaults/create", { name: newVaultName }, {
+        const response = await axios.post("/api/vaults/create", { name: newVaultName }, {
           withCredentials: true,
         });
 
@@ -120,6 +142,7 @@ export function AppSidebar({ ...props }) {
         const vaultsIndex = updatedNavMain.findIndex(item => item.title === "Vaults");
         if (vaultsIndex !== -1) {
           updatedNavMain[vaultsIndex].items.push({
+            id: response.data._id, // Assuming response has _id of new vault
             title: newVaultName,
             url: `#${newVaultName.toLowerCase().replace(/\s+/g, '-')}`,
           });
@@ -165,7 +188,25 @@ export function AppSidebar({ ...props }) {
         </Popover>
       </SidebarHeader>
       <SidebarContent className="-ml-1">
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain.map(section => {
+          if (section.title === "Vaults") {
+            return {
+              ...section,
+              items: section.items.map(vault => ({
+                ...vault,
+                title: (
+                  <div className="flex gap-[7rem] justify-between items-center">
+                    <span>{vault.title}</span>
+                    <button onClick={() => handleDeleteVault(vault.id)} className="text-red-500">
+                      <Trash className="h-4 w-4" />
+                    </button>
+                  </div>
+                )
+              }))
+            };
+          }
+          return section;
+        })} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
