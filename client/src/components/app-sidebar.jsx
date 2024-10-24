@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from "react"
 import {
   AudioWaveform,
@@ -48,7 +46,7 @@ const initialData = {
       name: "LockBox",
       logo: logo,
       plan: "Enterprise",
-      url: '/'
+      url: '/',
     },
   ],
   navMain: [
@@ -142,16 +140,17 @@ export function AppSidebar({ ...props }) {
         <TeamSwitcher teams={data.teams} />
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full mt-2">
-              <Plus className="mr-2 h-4 w-4" /> New Vault
+            <Button variant="outline" size="sm" className="w-full ml- mt-2">
+              <Plus className="h-4 w-4" />
+              <span className="ml- group-data-[collapsible=icon]:hidden">New Vault</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 ml-[8rem]">
+          <PopoverContent className="w-80 ml-[5rem]">
             <form onSubmit={handleNewVault}>
               <div className="grid gap-4">
                 <div className="space-y-2">
                   <h4 className="font-medium leading-none">Create New Vault</h4>
-                 
+                
                 </div>
                 <div className="grid gap-2">
                   <Input
@@ -167,7 +166,7 @@ export function AppSidebar({ ...props }) {
           </PopoverContent>
         </Popover>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="-ml-1">
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
