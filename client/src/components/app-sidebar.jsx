@@ -1,4 +1,4 @@
-import * as React from "react"
+// import * as React from "react"
 import {
   AudioWaveform,
   BookOpen,
@@ -33,106 +33,110 @@ import {
 } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import React, { useState, useEffect } from "react"; // Make sure to import useState and useEffect
+import axios from "axios";
 
 // This is sample data.
-const initialData = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "LockBox",
-      logo: logo,
-      plan: "Enterprise",
-      url: '/',
-    },
-  ],
-  navMain: [
-    {
-      title: "Vaults",
-      url: "#",
-      icon: Vault,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Tools",
-      url: "#",
-      icon: Wrench,
-      items: [
-        {
-          title: "Password Generator",
-          url: "/admin/passgen",
-        },
-        {
-          title: "Password health",
-          url: "/admin/passhealth",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "profile",
-          url: "/admin/profile",
-        },
-      ],
-    },
-  ],
-}
-
 export function AppSidebar({ ...props }) {
-  const [data, setData] = React.useState(initialData)
-  const [newVaultName, setNewVaultName] = React.useState("")
-  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false)
+  const [data, setData] = useState({
+    user: {
+      name: "shadcn",
+      email: "m@example.com",
+      avatar: "/avatars/shadcn.jpg",
+    },
+    teams: [
+      {
+        name: "LockBox",
+        logo: logo,
+        plan: "Enterprise",
+        url: "/",
+      },
+    ],
+    navMain: [
+      {
+        title: "Tools",
+        url: "#",
+        icon: Wrench,
+        items: [
+          {
+            title: "Password Generator",
+            url: "/admin/passgen",
+          },
+          {
+            title: "Password health",
+            url: "/admin/passhealth",
+          },
+        ],
+      },
+      {
+        title: "Settings",
+        url: "#",
+        icon: Settings2,
+        items: [
+          {
+            title: "Profile",
+            url: "/admin/profile",
+          },
+        ],
+      },
+    ],
+  });
+  
+  const [newVaultName, setNewVaultName] = useState("");
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-  const handleNewVault = (e) => {
-    e.preventDefault()
+  // Fetch vaults on component mount
+  useEffect(() => {
+    const fetchVaults = async () => {
+      try {
+        const response = await axios.get("/api/vaults/get");
+        const vaults = response.data.map((vault) => ({
+          title: vault.name,
+          url: `#${vault.name.toLowerCase().replace(/\s+/g, "-")}`,
+        }));
+        const updatedNavMain = [
+          {
+            title: "Vaults",
+            url: "#",
+            icon: Vault,
+            isActive: true,
+            items: vaults,
+          },
+          ...data.navMain,
+        ];
+        setData((prevState) => ({ ...prevState, navMain: updatedNavMain }));
+      } catch (error) {
+        console.error("Error fetching vaults:", error);
+      }
+    };
+
+    fetchVaults();
+  }, []);
+
+  const handleNewVault = async (e) => {
+    e.preventDefault();
     if (newVaultName.trim()) {
-      const updatedNavMain = [...data.navMain]
-      const vaultsIndex = updatedNavMain.findIndex(item => item.title === "Vaults")
-      
-      if (vaultsIndex !== -1) {
-        updatedNavMain[vaultsIndex].items.push({
-          title: newVaultName,
-          url: `#${newVaultName.toLowerCase().replace(/\s+/g, '-')}`,
-        })
-      } else {
-        updatedNavMain.unshift({
-          title: "Vaults",
-          url: "#",
-          icon: Vault,
-          isActive: true,
-          items: [{
+      try {
+        // Create the vault in the backend
+        await axios.post("/api/vaults/create", { name: newVaultName });
+
+        // Update the sidebar UI
+        const updatedNavMain = [...data.navMain];
+        const vaultsIndex = updatedNavMain.findIndex(item => item.title === "Vaults");
+        if (vaultsIndex !== -1) {
+          updatedNavMain[vaultsIndex].items.push({
             title: newVaultName,
             url: `#${newVaultName.toLowerCase().replace(/\s+/g, '-')}`,
-          }],
-        })
+          });
+        }
+        setData({ ...data, navMain: updatedNavMain });
+        setNewVaultName("");
+        setIsPopoverOpen(false);
+      } catch (error) {
+        console.error("Error creating new vault:", error);
       }
-
-      setData({ ...data, navMain: updatedNavMain })
-      setNewVaultName("")
-      setIsPopoverOpen(false)
     }
-  }
+  };
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -150,7 +154,6 @@ export function AppSidebar({ ...props }) {
               <div className="grid gap-4">
                 <div className="space-y-2">
                   <h4 className="font-medium leading-none">Create New Vault</h4>
-                
                 </div>
                 <div className="grid gap-2">
                   <Input
@@ -174,5 +177,5 @@ export function AppSidebar({ ...props }) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
