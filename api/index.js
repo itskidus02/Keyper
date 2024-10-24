@@ -6,8 +6,10 @@ import authRoutes from './routes/auth.route.js';
 import vaultRoutes from './routes/vault.routes.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+
 dotenv.config();
 
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO)
   .then(() => {
@@ -18,28 +20,26 @@ mongoose
   });
 
 const __dirname = path.resolve();
-
 const app = express();
 
-app.use(express.static(path.join(__dirname, '/client/dist')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
-});
-
+// Middleware for parsing JSON and cookies
 app.use(express.json());
-
 app.use(cookieParser());
 
-app.listen(8080, () => {
-  console.log('Server listening on port 8080');
-});
-
+// API routes
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/vaults', vaultRoutes);
 
+// Serve static files from the 'dist' directory
+app.use(express.static(path.join(__dirname, '/client/dist')));
 
+// Catch-all route to serve index.html for any other routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
+
+// Error handling middleware
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
@@ -48,4 +48,9 @@ app.use((err, req, res, next) => {
     message,
     statusCode,
   });
+});
+
+// Start the server
+app.listen(8080, () => {
+  console.log('Server listening on port 8080');
 });
