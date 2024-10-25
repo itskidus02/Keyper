@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
 
 // This is sample data.
 export function AppSidebar({ ...props }) {
@@ -88,7 +89,7 @@ export function AppSidebar({ ...props }) {
         const vaults = response.data.map((vault) => ({
           id: vault._id, // Assuming vault has an _id field in the backend
           title: vault.name,
-          url: `#${vault.name.toLowerCase().replace(/\s+/g, "-")}`,
+          url:`/admin/vault/${vault._id}`,
         }));
         const updatedNavMain = [
           {
@@ -198,11 +199,11 @@ export function AppSidebar({ ...props }) {
                 ...vault,
                 title: (
                   <div className="flex gap-[7rem] justify-between items-center">
-                    <span>{vault.title}</span>
-                    <button onClick={() => handleDeleteVault(vault.id)} className="text-red-500">
-                      <Trash className="h-4 w-4" />
-                    </button>
-                  </div>
+                  <Link to={`/admin/vault/${vault.id}`}>{vault.title}</Link> {/* Updated to Link */}
+                  <button onClick={() => handleDeleteVault(vault.id)} className="text-red-500">
+                    <Trash className="h-4 w-4" />
+                  </button>
+                </div>
                 )
               }))
             };

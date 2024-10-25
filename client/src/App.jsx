@@ -9,6 +9,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Sidebar from "./pages/private/Admin/Components/Sidebar";
 import PassGen from "./pages/private/Admin/Pages/PassGen";
 import PassHealth from "./pages/private/Admin/Pages/PassHealth";
+import VaultPage from "./pages/private/Admin/Pages/VaultPage";
 
 function App() {
   const location = useLocation();
@@ -30,6 +31,8 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="passgen" element={<PassGen />} />
             <Route path="passhealth" element={<PassHealth />} />
+            <Route path="vault/:vaultId" element={<VaultPage />} /> {/* Add VaultPage route */}
+
           </Route>
         </Route>
       </Routes>
