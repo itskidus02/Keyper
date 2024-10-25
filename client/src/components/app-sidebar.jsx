@@ -76,6 +76,7 @@ export function AppSidebar({ ...props }) {
   
   const [newVaultName, setNewVaultName] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isCreatingVault, setIsCreatingVault] = useState(false); // State to disable button during vault creation
 
   // Fetch vaults on component mount
   useEffect(() => {
@@ -111,12 +112,10 @@ export function AppSidebar({ ...props }) {
   // Handle deletion of a vault
   const handleDeleteVault = async (vaultId) => {
     try {
-      // Send a delete request to the server
       await axios.delete(`/api/vaults/delete/${vaultId}`, {
         withCredentials: true,
       });
 
-      // Remove the vault from the UI after deletion
       const updatedNavMain = [...data.navMain];
       const vaultsIndex = updatedNavMain.findIndex(item => item.title === "Vaults");
       if (vaultsIndex !== -1) {
@@ -131,13 +130,12 @@ export function AppSidebar({ ...props }) {
   const handleNewVault = async (e) => {
     e.preventDefault();
     if (newVaultName.trim()) {
+      setIsCreatingVault(true); // Disable button when creating a new vault
       try {
-        // Create the vault in the backend
         const response = await axios.post("/api/vaults/create", { name: newVaultName }, {
           withCredentials: true,
         });
 
-        // Update the sidebar UI
         const updatedNavMain = [...data.navMain];
         const vaultsIndex = updatedNavMain.findIndex(item => item.title === "Vaults");
         if (vaultsIndex !== -1) {
@@ -152,6 +150,8 @@ export function AppSidebar({ ...props }) {
         setIsPopoverOpen(false);
       } catch (error) {
         console.error("Error creating new vault:", error);
+      } finally {
+        setIsCreatingVault(false); // Re-enable button after creation attempt
       }
     }
   };
@@ -181,7 +181,9 @@ export function AppSidebar({ ...props }) {
                     onChange={(e) => setNewVaultName(e.target.value)}
                   />
                 </div>
-                <Button type="submit">Create Vault</Button>
+                <Button type="submit" disabled={isCreatingVault}>
+                  {isCreatingVault ? "Creating..." : "Create Vault"}
+                </Button>
               </div>
             </form>
           </PopoverContent>
