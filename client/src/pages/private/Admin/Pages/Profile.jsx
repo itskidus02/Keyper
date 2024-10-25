@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useSelector } from "react-redux";
 import { useState } from "react";
@@ -27,6 +27,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { toast, Toaster } from "sonner";
 
 export default function Profile() {
   const dispatch = useDispatch();
@@ -67,6 +68,7 @@ export default function Profile() {
       }
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
+      toast.success("User is updated successfully!");
     } catch (error) {
       dispatch(updateUserFailure(error));
     }
@@ -108,7 +110,9 @@ export default function Profile() {
       <Card className="max-w-lg mx-auto">
         <CardContent>
           <Alert>
-            <AlertDescription>No user data available. Please sign in.</AlertDescription>
+            <AlertDescription>
+              No user data available. Please sign in.
+            </AlertDescription>
           </Alert>
         </CardContent>
       </Card>
@@ -153,7 +157,10 @@ export default function Profile() {
         </form>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Popover open={isDeletePopoverOpen} onOpenChange={setIsDeletePopoverOpen}>
+        <Popover
+          open={isDeletePopoverOpen}
+          onOpenChange={setIsDeletePopoverOpen}
+        >
           <PopoverTrigger asChild>
             <Button variant="destructive" className="cursor-pointer">
               Delete Account
@@ -164,11 +171,15 @@ export default function Profile() {
               <div className="space-y-2">
                 <h4 className="font-medium leading-none">Confirm Deletion</h4>
                 <p className="text-sm text-muted-foreground">
-                  Are you sure you want to delete your account? This action cannot be undone.
+                  Are you sure you want to delete your account? This action
+                  cannot be undone.
                 </p>
               </div>
               <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsDeletePopoverOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDeletePopoverOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button variant="destructive" onClick={handleDeleteAccount}>
@@ -191,11 +202,7 @@ export default function Profile() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      {updateSuccess && (
-        <Alert className="mt-4">
-          <AlertDescription>User is updated successfully!</AlertDescription>
-        </Alert>
-      )}
+      {updateSuccess && <Toaster />}
     </Card>
   );
 }
