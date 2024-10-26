@@ -10,6 +10,7 @@ import Sidebar from "./pages/private/Admin/Components/Sidebar";
 import PassGen from "./pages/private/Admin/Pages/PassGen";
 import PassHealth from "./pages/private/Admin/Pages/PassHealth";
 import VaultPage from "./pages/private/Admin/Pages/VaultPage";
+import { FloatingDockDemo } from "./components/FloatingDockDemo";
 
 function App() {
   const location = useLocation();
@@ -17,7 +18,7 @@ function App() {
 
   return (
     <>
-      {!isAdminRoute && <Header />}
+      {!isAdminRoute && <FloatingDockDemo />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
