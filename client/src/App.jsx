@@ -18,7 +18,7 @@ function App() {
 
   return (
     <>
-      {!isAdminRoute && <FloatingDockDemo />}
+      {!isAdminRoute && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
