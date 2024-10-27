@@ -7,7 +7,7 @@ export default function Header() {
     <div className='bg-transparent text-black backdrop-blur-3xl'>
       <div className='flex justify-between items-center max-w-6xl mx-auto p-3'>
         <Link  className="flex items-center gap-3" to='/'>
-          <img src={logo} className='w-8 h-8' alt="" />
+          <img src={logo} className='w-10 h-8' alt="" />
           <h1 className='font-bold'>LockBox</h1>
         </Link>
         <ul className='flex items-center gap-4'>

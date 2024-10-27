@@ -1,13 +1,6 @@
-import React, { useState, useEffect } from "react"; // Make sure to import useState and useEffect
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  AudioWaveform,
-  Wrench,
-  Settings2,
-  Vault,
-  Plus,
-  Trash,
-} from "lucide-react";
+import { AudioWaveform, Wrench, Settings2, Vault, Plus, Trash } from "lucide-react";
 import logo from "../assets/images/logo.png";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -27,78 +20,49 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-// This is sample data.
 export function AppSidebar({ ...props }) {
   const [data, setData] = useState({
-    user: {
-      name: "shadcn",
-      email: "m@example.com",
-      avatar: "/avatars/shadcn.jpg",
-    },
-    teams: [
-      {
-        name: "LockBox",
-        logo: logo,
-        plan: "Enterprise",
-        url: "/",
-      },
-    ],
+    user: { name: "shadcn", email: "m@example.com", avatar: "/avatars/shadcn.jpg" },
+    teams: [{ name: "LockBox", logo: logo, plan: "Enterprise", url: "/" }],
     navMain: [
       {
         title: "Tools",
         url: "#",
         icon: Wrench,
         items: [
-          {
-            title: "Password Generator",
-            url: "/admin/passgen",
-          },
-          {
-            title: "Password health",
-            url: "/admin/passhealth",
-          },
+          { title: "Password Generator", url: "/admin/passgen" },
+          { title: "Password health", url: "/admin/passhealth" },
         ],
       },
       {
         title: "Settings",
         url: "#",
         icon: Settings2,
-        items: [
-          {
-            title: "Profile",
-            url: "/admin/profile",
-          },
-        ],
+        items: [{ title: "Profile", url: "/admin/profile" }],
       },
     ],
   });
-  
+
   const [newVaultName, setNewVaultName] = useState("");
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [isCreatingVault, setIsCreatingVault] = useState(false); // State to disable button during vault creation
+  const [isCreatingVault, setIsCreatingVault] = useState(false);
+  const navigate = useNavigate();
 
-  // Fetch vaults on component mount
   useEffect(() => {
     const fetchVaults = async () => {
       try {
         const response = await axios.get("/api/vaults/get", {
-          withCredentials: true, // Ensure cookies are sent with request
+          withCredentials: true,
         });
         const vaults = response.data.map((vault) => ({
-          id: vault._id, // Assuming vault has an _id field in the backend
+          id: vault._id,
           title: vault.name,
-          url:`/admin/vault/${vault._id}`,
+          url: `/admin/vault/${vault._id}`,
         }));
         const updatedNavMain = [
-          {
-            title: "Vaults",
-            url: "#",
-            icon: Vault,
-            isActive: true,
-            items: vaults,
-          },
+          { title: "Vaults", url: "#", icon: Vault, isActive: true, items: vaults },
           ...data.navMain,
         ];
         setData((prevState) => ({ ...prevState, navMain: updatedNavMain }));
@@ -106,21 +70,18 @@ export function AppSidebar({ ...props }) {
         console.error("Error fetching vaults:", error);
       }
     };
-
     fetchVaults();
   }, []);
 
-  // Handle deletion of a vault
   const handleDeleteVault = async (vaultId) => {
     try {
-      await axios.delete(`/api/vaults/delete/${vaultId}`, {
-        withCredentials: true,
-      });
-
+      await axios.delete(`/api/vaults/delete/${vaultId}`, { withCredentials: true });
       const updatedNavMain = [...data.navMain];
-      const vaultsIndex = updatedNavMain.findIndex(item => item.title === "Vaults");
+      const vaultsIndex = updatedNavMain.findIndex((item) => item.title === "Vaults");
       if (vaultsIndex !== -1) {
-        updatedNavMain[vaultsIndex].items = updatedNavMain[vaultsIndex].items.filter(vault => vault.id !== vaultId);
+        updatedNavMain[vaultsIndex].items = updatedNavMain[vaultsIndex].items.filter(
+          (vault) => vault.id !== vaultId
+        );
       }
       setData({ ...data, navMain: updatedNavMain });
     } catch (error) {
@@ -131,19 +92,21 @@ export function AppSidebar({ ...props }) {
   const handleNewVault = async (e) => {
     e.preventDefault();
     if (newVaultName.trim()) {
-      setIsCreatingVault(true); // Disable button when creating a new vault
+      setIsCreatingVault(true);
       try {
-        const response = await axios.post("/api/vaults/create", { name: newVaultName }, {
-          withCredentials: true,
-        });
+        const response = await axios.post(
+          "/api/vaults/create",
+          { name: newVaultName },
+          { withCredentials: true }
+        );
 
         const updatedNavMain = [...data.navMain];
-        const vaultsIndex = updatedNavMain.findIndex(item => item.title === "Vaults");
+        const vaultsIndex = updatedNavMain.findIndex((item) => item.title === "Vaults");
         if (vaultsIndex !== -1) {
           updatedNavMain[vaultsIndex].items.push({
-            id: response.data._id, // Assuming response has _id of new vault
+            id: response.data._id,
             title: newVaultName,
-            url: `#${newVaultName.toLowerCase().replace(/\s+/g, '-')}`,
+            url: `/admin/vault/${response.data._id}`,
           });
         }
         setData({ ...data, navMain: updatedNavMain });
@@ -152,7 +115,7 @@ export function AppSidebar({ ...props }) {
       } catch (error) {
         console.error("Error creating new vault:", error);
       } finally {
-        setIsCreatingVault(false); // Re-enable button after creation attempt
+        setIsCreatingVault(false);
       }
     }
   };
@@ -163,7 +126,7 @@ export function AppSidebar({ ...props }) {
         <TeamSwitcher teams={data.teams} />
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full ml- mt-2">
+            <Button variant="outline" size="sm" className="w-full mt-2">
               <Plus className="h-4 w-4" />
               <span className="ml- group-data-[collapsible=icon]:hidden">New Vault</span>
             </Button>
@@ -191,25 +154,29 @@ export function AppSidebar({ ...props }) {
         </Popover>
       </SidebarHeader>
       <SidebarContent className="-ml-1">
-        <NavMain items={data.navMain.map(section => {
-          if (section.title === "Vaults") {
-            return {
-              ...section,
-              items: section.items.map(vault => ({
-                ...vault,
-                title: (
-                  <div className="flex gap-[7rem] justify-between items-center">
-                  <Link to={`/admin/vault/${vault.id}`}>{vault.title}</Link> {/* Updated to Link */}
-                  <button onClick={() => handleDeleteVault(vault.id)} className="text-red-500">
-                    <Trash className="h-4 w-4" />
-                  </button>
-                </div>
-                )
-              }))
-            };
-          }
-          return section;
-        })} />
+        <NavMain
+          items={data.navMain.map((section) => {
+            if (section.title === "Vaults") {
+              return {
+                ...section,
+                items: section.items.map((vault) => ({
+                  ...vault,
+                  title: (
+                    <div className="flex gap-[7rem] justify-between items-center">
+                      <button onClick={() => navigate(`/admin/vault/${vault.id}`)}>
+                        {vault.title}
+                      </button>
+                      <button onClick={() => handleDeleteVault(vault.id)} className="text-red-500">
+                        <Trash className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ),
+                })),
+              };
+            }
+            return section;
+          })}
+        />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
