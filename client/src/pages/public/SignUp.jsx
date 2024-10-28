@@ -1,3 +1,8 @@
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -36,44 +41,71 @@ export default function SignUp() {
     }
   };
   return (
-    <div className='p-3 max-w-lg mx-auto'>
-      <h1 className='text-3xl text-center font-semibold my-7'>Sign Up</h1>
-      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-        <input
-          type='text'
-          placeholder='Username'
-          id='username'
-          className='bg-slate-100 p-3 rounded-lg'
-          onChange={handleChange}
-        />
-        <input
-          type='email'
-          placeholder='Email'
-          id='email'
-          className='bg-slate-100 p-3 rounded-lg'
-          onChange={handleChange}
-        />
-        <input
-          type='password'
-          placeholder='Password'
-          id='password'
-          className='bg-slate-100 p-3 rounded-lg'
-          onChange={handleChange}
-        />
-        <button
+      <Card className="w-full mt-8 mx-auto max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Sign Up</CardTitle>
+          <CardDescription className="text-center">Join us if it is your first time</CardDescription>
+
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                type="text"
+                id="username"
+                placeholder="Enter your username"
+                onChange={handleChange}
+                required
+                className=" p-3 rounded-lg"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                onChange={handleChange}
+                required
+                className=" p-3 rounded-lg"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                onChange={handleChange}
+                required
+                className=" p-3 rounded-lg"
+              />
+            </div>
+            <Button
           disabled={loading}
-          className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
+          className='w-full text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
         >
           {loading ? 'Loading...' : 'Sign Up'}
-        </button>
-      </form>
-      <div className='flex gap-2 mt-5'>
-        <p>Have an account?</p>
-        <Link to='/sign-in'>
-          <span className='text-blue-500'>Sign in</span>
-        </Link>
-      </div>
-      <p className='text-red-700 mt-5'>{error && 'Something went wrong!'}</p>
-    </div>
+        </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col items-center space-y-2">
+          <div className="text-sm ">
+          <span className='text-gray-500'>Already have an account?{' '}</span>  
+            <Link to="/sign-in" className="text-primary hover:underline">
+              Sign in
+            </Link>
+          </div>
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertDescription>
+                Something went wrong. Please try again.
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardFooter>
+      </Card>
   );
+  
 }
