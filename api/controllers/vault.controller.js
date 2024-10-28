@@ -21,14 +21,18 @@ export const addDataToVault = async (req, res) => {
     const { id } = req.params;
     const { data } = req.body;
 
-    // Encrypt data
-    const salt = await bcrypt.genSalt(10);
-    const encryptedData = await bcrypt.hash(data, salt);
+    // Encrypt each data entry
+    const encryptedEntries = await Promise.all(
+      data.map(async (entry) => {
+        const salt = await bcrypt.genSalt(10);
+        return await bcrypt.hash(entry, salt);
+      })
+    );
 
-    // Update vault with encrypted data
+    // Update vault with encrypted entries
     const vault = await Vault.findByIdAndUpdate(
       id,
-      { $push: { entries: encryptedData } }, // Use an array to store multiple entries
+      { $push: { entries: { $each: encryptedEntries } } },
       { new: true }
     );
 
