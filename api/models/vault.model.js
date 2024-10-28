@@ -13,8 +13,9 @@ const vaultSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true, // Ensures every vault is linked to a user
+    required: true,
   },
+  entries: [String],  // Array to store encrypted entries
 });
 
 const Vault = mongoose.model('Vault', vaultSchema);

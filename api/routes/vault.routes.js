@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  addDataToVault,
   createVault,
   deleteVault,
   getUserVaults,
@@ -11,6 +12,7 @@ const router = express.Router();
 
 // Create a new vault (protected)
 router.post('/create', verifyToken, createVault);
+router.post('/add-data/:id', verifyToken, addDataToVault);
 
 // Get all vaults for a specific user (protected)
 router.get('/get', verifyToken, getUserVaults);

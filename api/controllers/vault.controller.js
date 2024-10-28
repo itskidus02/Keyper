@@ -1,4 +1,5 @@
 import Vault from '../models/vault.model.js';
+import bcrypt from 'bcryptjs';
 
 // Create a new vault
 // Create a new vault
@@ -13,6 +14,31 @@ export const createVault = async (req, res) => {
     res.status(201).json(vault);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+export const addDataToVault = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { data } = req.body;
+
+    // Encrypt data
+    const salt = await bcrypt.genSalt(10);
+    const encryptedData = await bcrypt.hash(data, salt);
+
+    // Update vault with encrypted data
+    const vault = await Vault.findByIdAndUpdate(
+      id,
+      { $push: { entries: encryptedData } }, // Use an array to store multiple entries
+      { new: true }
+    );
+
+    if (!vault) {
+      return res.status(404).json({ message: "Vault not found" });
+    }
+
+    res.status(200).json({ message: "Data added successfully", vault });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
