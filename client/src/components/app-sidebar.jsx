@@ -29,7 +29,11 @@ export function AppSidebar({ ...props }) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isCreatingVault, setIsCreatingVault] = useState(false);
   const navigate = useNavigate();
-  const [isCollapsed, setIsCollapsed] = useState(false); // Track collapsed state
+
+  // Track collapsed state for each section
+  const [isVaultCollapsed, setIsVaultCollapsed] = useState(false);
+  const [isToolsCollapsed, setIsToolsCollapsed] = useState(false);
+  const [isSettingsCollapsed, setIsSettingsCollapsed] = useState(false);
 
   const data = {
     user: { name: "shadcn", email: "m@example.com", avatar: "/avatars/shadcn.jpg" },
@@ -66,10 +70,6 @@ export function AppSidebar({ ...props }) {
     dispatch(deleteVault(vaultId));
   };
 
-  const toggleCollapse = () => {
-    setIsCollapsed((prev) => !prev);
-  };
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -104,19 +104,19 @@ export function AppSidebar({ ...props }) {
         </Popover>
       </SidebarHeader>
       <SidebarContent className="p-4 space-y-1">
-        {/* vaults */}
+        {/* Vaults Section */}
         <Collapsible>
-          <CollapsibleTrigger onClick={toggleCollapse} className="flex items-center justify-between w-full">
+          <CollapsibleTrigger onClick={() => setIsVaultCollapsed(!isVaultCollapsed)} className="flex  items-center justify-between w-full">
             <div className="flex items-center gap-3 font-semibold">
               <Vault className="h-6 -ml-1 w-6" />
               <h4>Vaults</h4>
             </div>
-            {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {isVaultCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-2 space-y-2">
             {vaults.map((vault) => (
               <div key={vault._id} className="flex ml-8 text-sm justify-between items-center">
-                <button onClick={() => navigate(`/admin/vault/${vault._id}`)}>{vault.name.slice(0,13)}</button>
+                <button className="transition-all w-full justify-start text-left mr-9 m-1 hover:text-gray-400" onClick={() => navigate(`/admin/vault/${vault._id}`)}>{vault.name.slice(0,13)}</button>
                 <button onClick={() => handleDeleteVault(vault._id)} className="text-red-500">
                   <Trash className="h-4 w-4" />
                 </button>
@@ -124,14 +124,27 @@ export function AppSidebar({ ...props }) {
             ))}
           </CollapsibleContent>
         </Collapsible>
+
+        {/* Main Navigation Sections */}
         {data.navMain.map((section, index) => (
           <Collapsible key={index}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full">
+            <CollapsibleTrigger
+              onClick={() =>
+                section.title === "Tools"
+                  ? setIsToolsCollapsed(!isToolsCollapsed)
+                  : setIsSettingsCollapsed(!isSettingsCollapsed)
+              }
+              className="flex items-center justify-between w-full"
+            >
               <div className="flex items-center gap-3 font-semibold">
                 <section.icon className="h-6 -ml-1 w-6" />
                 <h4>{section.title}</h4>
               </div>
-              <ChevronDown className="h-4 w-4" />
+              {(section.title === "Tools" && isToolsCollapsed) || (section.title === "Settings" && isSettingsCollapsed) ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-2 ml-8 space-y-2">
               {section.items.map((item) => (
