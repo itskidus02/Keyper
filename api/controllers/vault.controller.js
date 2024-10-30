@@ -1,8 +1,27 @@
 import Vault from '../models/vault.model.js';
-import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
-// Create a new vault
-// Create a new vault
+const encryptionKey = process.env.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef';  // 32-byte key for AES-256
+const iv = crypto.randomBytes(16); // Initialization vector
+
+// Helper function for AES encryption
+const encryptData = (text) => {
+  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(encryptionKey), iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return `${iv.toString('hex')}:${encrypted.toString('hex')}`; // Return IV and encrypted text
+};
+
+// Helper function for AES decryption
+const decryptData = (text) => {
+  const [ivHex, encryptedText] = text.split(':');
+  const ivBuffer = Buffer.from(ivHex, 'hex');
+  const encryptedBuffer = Buffer.from(encryptedText, 'hex');
+  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(encryptionKey), ivBuffer);
+  let decrypted = decipher.update(encryptedBuffer);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
+};
 export const createVault = async (req, res) => {
   try {
     const { name } = req.body;
@@ -21,15 +40,7 @@ export const addDataToVault = async (req, res) => {
     const { id } = req.params;
     const { data } = req.body;
 
-    // Encrypt each data entry
-    const encryptedEntries = await Promise.all(
-      data.map(async (entry) => {
-        const salt = await bcrypt.genSalt(10);
-        return await bcrypt.hash(entry, salt);
-      })
-    );
-
-    // Update vault with encrypted entries
+    const encryptedEntries = data.map((entry) => encryptData(entry));
     const vault = await Vault.findByIdAndUpdate(
       id,
       { $push: { entries: { $each: encryptedEntries } } },
@@ -39,7 +50,6 @@ export const addDataToVault = async (req, res) => {
     if (!vault) {
       return res.status(404).json({ message: "Vault not found" });
     }
-
     res.status(200).json({ message: "Data added successfully", vault });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -93,7 +103,10 @@ export const getVaultById = async (req, res) => {
     if (!vault) {
       return res.status(404).json({ message: 'Vault not found' });
     }
-    res.json(vault);
+    
+    // Decrypt entries before sending
+    const decryptedEntries = vault.entries.map((entry) => decryptData(entry));
+    res.json({ ...vault.toObject(), entries: decryptedEntries });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

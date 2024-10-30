@@ -5,14 +5,16 @@ import axios from "axios";
 function VaultPage() {
   const { vaultId } = useParams();
   const [fields, setFields] = useState([{ value: "" }]);
-  const [vaultName, setVaultName] = useState(""); // State for vault name
+  const [vaultName, setVaultName] = useState("");
+  const [entries, setEntries] = useState([]); // State for decrypted entries
 
   // Fetch vault details on component mount
   useEffect(() => {
     const fetchVaultDetails = async () => {
       try {
         const response = await axios.get(`/api/vaults/get/${vaultId}`);
-        setVaultName(response.data.name); // Set vault name from API response
+        setVaultName(response.data.name);
+        setEntries(response.data.entries); // Set decrypted entries
       } catch (error) {
         console.error("Error fetching vault details:", error);
       }
@@ -50,6 +52,14 @@ function VaultPage() {
   return (
     <div>
       <h2>Vault: {vaultName} (ID: {vaultId})</h2>
+
+      <h3>Decrypted Entries:</h3>
+      <ul>
+        {entries.map((entry, index) => (
+          <li key={index}>{entry}</li>
+        ))}
+      </ul>
+
       <form onSubmit={handleSubmit}>
         {fields.map((field, index) => (
           <div key={index}>
