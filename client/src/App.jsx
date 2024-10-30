@@ -1,4 +1,8 @@
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { store } from "./redux/store";
+import { fetchVaults } from "./redux/vault/vaultSlice";
 import Home from "./pages/public/Home";
 import About from "./pages/public/About";
 import SignIn from "./pages/public/SignIn";
@@ -10,11 +14,34 @@ import Sidebar from "./pages/private/Admin/Components/Sidebar";
 import PassGen from "./pages/private/Admin/Pages/PassGen";
 import PassHealth from "./pages/private/Admin/Pages/PassHealth";
 import VaultPage from "./pages/private/Admin/Pages/VaultPage";
-import { FloatingDockDemo } from "./components/FloatingDockDemo";
 
-function App() {
+function AppContent() {
   const location = useLocation();
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user); 
   const isAdminRoute = location.pathname.startsWith("/admin");
+
+  // Track previous user to detect actual sign-out
+  const [previousUser, setPreviousUser] = useState(currentUser);
+
+  // Update previousUser whenever currentUser changes
+  useEffect(() => {
+    setPreviousUser(currentUser);
+  }, [currentUser]);
+
+  // Fetch vaults whenever the user changes or page changes
+  useEffect(() => {
+    if (currentUser) {
+      dispatch(fetchVaults());
+    }
+  }, [dispatch, location, currentUser]);
+
+  // Reload page on sign-out only
+  useEffect(() => {
+    if (previousUser && !currentUser) {
+      window.location.reload();
+    }
+  }, [currentUser, previousUser]);
 
   return (
     <>
@@ -32,8 +59,7 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="passgen" element={<PassGen />} />
             <Route path="passhealth" element={<PassHealth />} />
-            <Route path="vault/:vaultId" element={<VaultPage />} /> {/* Add VaultPage route */}
-
+            <Route path="vault/:vaultId" element={<VaultPage />} />
           </Route>
         </Route>
       </Routes>
@@ -41,10 +67,12 @@ function App() {
   );
 }
 
-export default function Root() {
+export default function App() {
   return (
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </Provider>
   );
 }
