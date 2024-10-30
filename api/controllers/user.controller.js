@@ -1,6 +1,7 @@
 import User from '../models/user.model.js';
 import { errorHandler } from '../utils/error.js';
 import bcryptjs from 'bcryptjs';
+import Vault from '../models/vault.model.js'; // Import Vault model
 
 export const test = (req, res) => {
   res.json({
@@ -47,10 +48,14 @@ export const deleteUser = async (req, res, next) => {
     return next(errorHandler(401, 'You can delete only your account!'));
   }
   try {
+    // Delete all vaults associated with the user
+    await Vault.deleteMany({ user: req.params.id });
+    
+    // Delete the user
     await User.findByIdAndDelete(req.params.id);
-    res.status(200).json('User has been deleted...');
+    
+    res.status(200).json('User and their vaults have been deleted.');
   } catch (error) {
     next(error);
   }
-
-}
+};
