@@ -97,7 +97,19 @@ export function AppSidebar({ ...props }) {
           </PopoverContent>
         </Popover>
       </SidebarHeader>
-      <SidebarContent className="-ml-1 space-y-4">
+      <SidebarContent className="ml-3 space-y-4">
+           {/* vautls */}
+      <div>
+          <h4 className="font-semibold mb-2">Vaults</h4>
+          {vaults.map((vault) => (
+            <div key={vault._id} className="flex justify-between items-center mb-2">
+              <button onClick={() => navigate(`/admin/vault/${vault._id}`)}>{vault.name}</button>
+              <button onClick={() => handleDeleteVault(vault._id)} className="text-red-500">
+                <Trash className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
         {data.navMain.map((section, index) => (
           <div key={index}>
             <h4 className="font-semibold mb-2 flex items-center gap-2">
@@ -109,7 +121,7 @@ export function AppSidebar({ ...props }) {
                 <button
                   key={item.url}
                   onClick={() => navigate(item.url)}
-                  className="text-sm text-left hover:text-blue-500"
+                  className="text-sm w-full text-left hover:text-blue-500"
                 >
                   {item.title}
                 </button>
@@ -117,18 +129,8 @@ export function AppSidebar({ ...props }) {
             </div>
           </div>
         ))}
-
-        <div>
-          <h4 className="font-semibold mb-2">Vaults</h4>
-          {vaults.map((vault) => (
-            <div key={vault._id} className="flex justify-between items-center mb-2">
-              <button onClick={() => navigate(`/admin/vault/${vault._id}`)}>{vault.name}</button>
-              <button onClick={() => handleDeleteVault(vault._id)} className="text-red-500">
-                <Trash className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
+       
+     
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
