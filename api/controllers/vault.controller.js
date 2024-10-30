@@ -1,7 +1,10 @@
 import Vault from '../models/vault.model.js';
 import crypto from 'crypto';
+import dotenv from 'dotenv';
 
-const encryptionKey = process.env.ENCRYPTION_KEY || '0123456789abcdef0123456789abcdef';  // 32-byte key for AES-256
+// Load environment variables from .env file
+dotenv.config();
+const encryptionKey = process.env.ENCRYPTION_KEY;  // 32-byte key for AES-256
 const iv = crypto.randomBytes(16); // Initialization vector
 
 // Helper function for AES encryption
