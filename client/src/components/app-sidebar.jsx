@@ -29,9 +29,9 @@ export function AppSidebar({ ...props }) {
   const [isCreatingVault, setIsCreatingVault] = useState(false);
   const navigate = useNavigate();
 
-  const [isVaultCollapsed, setIsVaultCollapsed] = useState(false);
-  const [isToolsCollapsed, setIsToolsCollapsed] = useState(false);
-  const [isSettingsCollapsed, setIsSettingsCollapsed] = useState(false);
+  const [isVaultCollapsed, setIsVaultCollapsed] = useState(true);
+  const [isToolsCollapsed, setIsToolsCollapsed] = useState(true);
+  const [isSettingsCollapsed, setIsSettingsCollapsed] = useState(true);
 
   const vaultRef = useRef(null);
   const toolsRef = useRef(null);
@@ -120,7 +120,7 @@ export function AppSidebar({ ...props }) {
               <Vault className="h-6 -ml-1 w-6" />
               <h4>Vaults</h4>
             </div>
-            {isVaultCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {isVaultCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
           </div>
           <div ref={vaultRef} style={getCollapseStyle(isVaultCollapsed, vaultRef)} className="mt-2 space-y-2">
             {vaults.map((vault) => (
@@ -150,9 +150,9 @@ export function AppSidebar({ ...props }) {
                 <h4>{section.title}</h4>
               </div>
               {(section.title === "Tools" && isToolsCollapsed) || (section.title === "Settings" && isSettingsCollapsed) ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
                 <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronUp className="h-4 w-4" />
               )}
             </div>
             <div
