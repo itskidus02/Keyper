@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteVault, createVault } from '../redux/vault/vaultSlice';
-import { Wrench, Settings2, Plus, Trash, ChevronDown, Vault } from "lucide-react";
+import { Wrench, Settings2, Plus, Trash, ChevronDown, ChevronUp, Vault } from "lucide-react";
 import logo from "../assets/images/logo.png";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -29,6 +29,7 @@ export function AppSidebar({ ...props }) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isCreatingVault, setIsCreatingVault] = useState(false);
   const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(false); // Track collapsed state
 
   const data = {
     user: { name: "shadcn", email: "m@example.com", avatar: "/avatars/shadcn.jpg" },
@@ -63,6 +64,10 @@ export function AppSidebar({ ...props }) {
 
   const handleDeleteVault = (vaultId) => {
     dispatch(deleteVault(vaultId));
+  };
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => !prev);
   };
 
   return (
@@ -101,14 +106,14 @@ export function AppSidebar({ ...props }) {
       <SidebarContent className="p-4 space-y-1">
         {/* vaults */}
         <Collapsible>
-          <CollapsibleTrigger className="flex items-center justify-between w-full">
+          <CollapsibleTrigger onClick={toggleCollapse} className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3 font-semibold">
               <Vault className="h-6 -ml-1 w-6" />
               <h4>Vaults</h4>
             </div>
-            <ChevronDown className="h-4 w-4" />
+            {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </CollapsibleTrigger>
-          <CollapsibleContent className="mt-2  space-y-2">
+          <CollapsibleContent className="mt-2 space-y-2">
             {vaults.map((vault) => (
               <div key={vault._id} className="flex ml-8 text-sm justify-between items-center">
                 <button onClick={() => navigate(`/admin/vault/${vault._id}`)}>{vault.name.slice(0,13)}</button>
