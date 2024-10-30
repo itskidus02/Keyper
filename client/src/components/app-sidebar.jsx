@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteVault, createVault } from '../redux/vault/vaultSlice';
-import { Wrench, Settings2, Plus, Trash } from "lucide-react";
+import { Wrench, Settings2, Plus, Trash, ChevronDown, Vault } from "lucide-react";
 import logo from "../assets/images/logo.png";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export function AppSidebar({ ...props }) {
   const dispatch = useDispatch();
@@ -72,7 +73,7 @@ export function AppSidebar({ ...props }) {
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="w-full mt-2">
               <Plus className="h-4 w-4" />
-              <span className="ml- group-data-[collapsible=icon]:hidden">New Vault</span>
+              <span className="ml-2 group-data-[collapsible=icon]:hidden">New Vault</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80 ml-[5rem]">
@@ -97,26 +98,37 @@ export function AppSidebar({ ...props }) {
           </PopoverContent>
         </Popover>
       </SidebarHeader>
-      <SidebarContent className="ml-3 space-y-4">
-           {/* vautls */}
-      <div>
-          <h4 className="font-semibold mb-2">Vaults</h4>
-          {vaults.map((vault) => (
-            <div key={vault._id} className="flex justify-between items-center mb-2">
-              <button onClick={() => navigate(`/admin/vault/${vault._id}`)}>{vault.name}</button>
-              <button onClick={() => handleDeleteVault(vault._id)} className="text-red-500">
-                <Trash className="h-4 w-4" />
-              </button>
+      <SidebarContent className="p-4 space-y-1">
+        {/* vaults */}
+        <Collapsible>
+          <CollapsibleTrigger className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-3 font-semibold">
+              <Vault className="h-6 -ml-1 w-6" />
+              <h4>Vaults</h4>
             </div>
-          ))}
-        </div>
+            <ChevronDown className="h-4 w-4" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-2  space-y-2">
+            {vaults.map((vault) => (
+              <div key={vault._id} className="flex ml-8 text-sm justify-between items-center">
+                <button onClick={() => navigate(`/admin/vault/${vault._id}`)}>{vault.name.slice(0,13)}</button>
+                <button onClick={() => handleDeleteVault(vault._id)} className="text-red-500">
+                  <Trash className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
         {data.navMain.map((section, index) => (
-          <div key={index}>
-            <h4 className="font-semibold mb-2 flex items-center gap-2">
-              <section.icon className="h-4 w-4" />
-              {section.title}
-            </h4>
-            <div className="ml-4 space-y-2">
+          <Collapsible key={index}>
+            <CollapsibleTrigger className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-3 font-semibold">
+                <section.icon className="h-6 -ml-1 w-6" />
+                <h4>{section.title}</h4>
+              </div>
+              <ChevronDown className="h-4 w-4" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-2 ml-8 space-y-2">
               {section.items.map((item) => (
                 <button
                   key={item.url}
@@ -126,11 +138,9 @@ export function AppSidebar({ ...props }) {
                   {item.title}
                 </button>
               ))}
-            </div>
-          </div>
+            </CollapsibleContent>
+          </Collapsible>
         ))}
-       
-     
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
