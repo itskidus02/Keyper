@@ -167,7 +167,7 @@ export function AppSidebar({ ...props }) {
                 <button
                   key={item.url}
                   onClick={() => navigate(item.url)}
-                  className="text-sm w-full text-left hover:text-blue-500"
+                  className="text-sm w-full text-left transition-all  justify-start  mr-9 m-1 hover:text-gray-400"
                 >
                   {item.title}
                 </button>
