@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteVault, createVault } from '../redux/vault/vaultSlice';
 import { Wrench, Settings2, Plus, Trash, ChevronDown, ChevronUp, Vault } from "lucide-react";
@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export function AppSidebar({ ...props }) {
   const dispatch = useDispatch();
@@ -30,10 +29,35 @@ export function AppSidebar({ ...props }) {
   const [isCreatingVault, setIsCreatingVault] = useState(false);
   const navigate = useNavigate();
 
-  // Track collapsed state for each section
   const [isVaultCollapsed, setIsVaultCollapsed] = useState(false);
   const [isToolsCollapsed, setIsToolsCollapsed] = useState(false);
   const [isSettingsCollapsed, setIsSettingsCollapsed] = useState(false);
+
+  const vaultRef = useRef(null);
+  const toolsRef = useRef(null);
+  const settingsRef = useRef(null);
+
+  const getCollapseStyle = (isCollapsed, ref) => ({
+    height: isCollapsed ? '0px' : `${ref.current?.scrollHeight}px`,
+    opacity: isCollapsed ? 0 : 1,
+    overflow: 'hidden',
+    transition: 'height 0.3s ease, opacity 0.3s ease',
+  });
+
+  const handleNewVault = async (e) => {
+    e.preventDefault();
+    if (newVaultName.trim()) {
+      setIsCreatingVault(true);
+      dispatch(createVault(newVaultName));
+      setNewVaultName('');
+      setIsPopoverOpen(false);
+      setIsCreatingVault(false);
+    }
+  };
+
+  const handleDeleteVault = (vaultId) => {
+    dispatch(deleteVault(vaultId));
+  };
 
   const data = {
     user: { name: "shadcn", email: "m@example.com", avatar: "/avatars/shadcn.jpg" },
@@ -53,21 +77,6 @@ export function AppSidebar({ ...props }) {
         items: [{ title: "Profile", url: "/admin/profile" }],
       },
     ],
-  };
-
-  const handleNewVault = async (e) => {
-    e.preventDefault();
-    if (newVaultName.trim()) {
-      setIsCreatingVault(true);
-      dispatch(createVault(newVaultName));
-      setNewVaultName('');
-      setIsPopoverOpen(false);
-      setIsCreatingVault(false);
-    }
-  };
-
-  const handleDeleteVault = (vaultId) => {
-    dispatch(deleteVault(vaultId));
   };
 
   return (
@@ -105,15 +114,15 @@ export function AppSidebar({ ...props }) {
       </SidebarHeader>
       <SidebarContent className="p-4 space-y-1">
         {/* Vaults Section */}
-        <Collapsible>
-          <CollapsibleTrigger onClick={() => setIsVaultCollapsed(!isVaultCollapsed)} className="flex  items-center justify-between w-full">
+        <div>
+          <div onClick={() => setIsVaultCollapsed(!isVaultCollapsed)} className="flex items-center justify-between w-full cursor-pointer">
             <div className="flex items-center gap-3 font-semibold">
               <Vault className="h-6 -ml-1 w-6" />
               <h4>Vaults</h4>
             </div>
             {isVaultCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-2 space-y-2">
+          </div>
+          <div ref={vaultRef} style={getCollapseStyle(isVaultCollapsed, vaultRef)} className="mt-2 space-y-2">
             {vaults.map((vault) => (
               <div key={vault._id} className="flex ml-8 text-sm justify-between items-center">
                 <button className="transition-all w-full justify-start text-left mr-9 m-1 hover:text-gray-400" onClick={() => navigate(`/admin/vault/${vault._id}`)}>{vault.name.slice(0,13)}</button>
@@ -122,19 +131,19 @@ export function AppSidebar({ ...props }) {
                 </button>
               </div>
             ))}
-          </CollapsibleContent>
-        </Collapsible>
+          </div>
+        </div>
 
         {/* Main Navigation Sections */}
         {data.navMain.map((section, index) => (
-          <Collapsible key={index}>
-            <CollapsibleTrigger
+          <div key={index}>
+            <div
               onClick={() =>
                 section.title === "Tools"
                   ? setIsToolsCollapsed(!isToolsCollapsed)
                   : setIsSettingsCollapsed(!isSettingsCollapsed)
               }
-              className="flex items-center justify-between w-full"
+              className="flex items-center justify-between w-full cursor-pointer"
             >
               <div className="flex items-center gap-3 font-semibold">
                 <section.icon className="h-6 -ml-1 w-6" />
@@ -145,8 +154,15 @@ export function AppSidebar({ ...props }) {
               ) : (
                 <ChevronDown className="h-4 w-4" />
               )}
-            </CollapsibleTrigger>
-            <CollapsibleContent className="mt-2 ml-8 space-y-2">
+            </div>
+            <div
+              ref={section.title === "Tools" ? toolsRef : settingsRef}
+              style={getCollapseStyle(
+                section.title === "Tools" ? isToolsCollapsed : isSettingsCollapsed,
+                section.title === "Tools" ? toolsRef : settingsRef
+              )}
+              className="mt-2 ml-8 space-y-2"
+            >
               {section.items.map((item) => (
                 <button
                   key={item.url}
@@ -156,8 +172,8 @@ export function AppSidebar({ ...props }) {
                   {item.title}
                 </button>
               ))}
-            </CollapsibleContent>
-          </Collapsible>
+            </div>
+          </div>
         ))}
       </SidebarContent>
       <SidebarFooter>
