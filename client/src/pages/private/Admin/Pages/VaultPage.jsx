@@ -10,14 +10,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Save } from "lucide-react";
+import { Plus, Save, Eye, EyeOff, Clipboard } from "lucide-react";
+import { toast,  Toaster} from "sonner";
 
-function VaultPage() {
+export default function VaultPage() {
   const { vaultId } = useParams();
   const [fields, setFields] = useState([{ name: "", value: "" }]);
   const [vaultName, setVaultName] = useState("");
   const [entries, setEntries] = useState([]);
   const [createdAt, setCreatedAt] = useState("");
+  const [visibleEntries, setVisibleEntries] = useState({});
 
   useEffect(() => {
     const fetchVaultDetails = async () => {
@@ -60,9 +62,27 @@ function VaultPage() {
     }
   };
 
+  const toggleVisibility = (index) => {
+    setVisibleEntries(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      // You can add a toast notification here if you want
+      toast.success('Copied to clipboard');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  };
+
   return (
     <div className="min-h-screen p-8">
-      <div className="max-w-6xl ring mx-auto">
+            <Toaster position="bottom-right"  />
+
+      <div className="max-w-6xl p-3 rounded-lg ring mx-auto">
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Vault: {vaultName}</h2>
           <p className="text-sm text-gray-600">Created: {new Date(createdAt).toLocaleString()}</p>
@@ -76,19 +96,32 @@ function VaultPage() {
                 <TableHead className="w-[200px]">Name</TableHead>
                 <TableHead>Value</TableHead>
                 <TableHead className="w-[200px]">Created At</TableHead>
+                <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {entries.map((entry, index) => (
                 <TableRow key={index}>
                   <TableCell className="font-medium">{entry.name}</TableCell>
-                  <TableCell>{entry.value}</TableCell>
+                  <TableCell>
+                    {visibleEntries[index] ? entry.value : '••••••••'}
+                  </TableCell>
                   <TableCell>{new Date(entry.createdAt).toLocaleString()}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <button onClick={() => toggleVisibility(index)} className="p-1">
+                        {visibleEntries[index] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                      <button onClick={() => copyToClipboard(entry.value)} className="p-1">
+                        <Clipboard className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
               {entries.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center text-gray-500">
+                  <TableCell colSpan={4} className="text-center text-gray-500">
                     No entries yet
                   </TableCell>
                 </TableRow>
@@ -142,5 +175,3 @@ function VaultPage() {
     </div>
   );
 }
-
-export default VaultPage;
