@@ -1,36 +1,32 @@
 import Vault from '../models/vault.model.js';
 import crypto from 'crypto';
-import dotenv from 'dotenv';
-
-// Load environment variables from .env file
-dotenv.config();
-const encryptionKey = process.env.ENCRYPTION_KEY;  // 32-byte key for AES-256
-const iv = crypto.randomBytes(16); // Initialization vector
 
 // Helper function for AES encryption
-const encryptData = (text) => {
-  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(encryptionKey), iv);
+const encryptData = (text, key) => {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key, 'hex'), iv);
   let encrypted = cipher.update(text);
   encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return `${iv.toString('hex')}:${encrypted.toString('hex')}`; // Return IV and encrypted text
+  return `${iv.toString('hex')}:${encrypted.toString('hex')}`;
 };
 
 // Helper function for AES decryption
-const decryptData = (text) => {
+const decryptData = (text, key) => {
   const [ivHex, encryptedText] = text.split(':');
-  const ivBuffer = Buffer.from(ivHex, 'hex');
+  const iv = Buffer.from(ivHex, 'hex');
   const encryptedBuffer = Buffer.from(encryptedText, 'hex');
-  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(encryptionKey), ivBuffer);
+  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key, 'hex'), iv);
   let decrypted = decipher.update(encryptedBuffer);
   decrypted = Buffer.concat([decrypted, decipher.final()]);
   return decrypted.toString();
 };
+
 export const createVault = async (req, res) => {
   try {
     const { name } = req.body;
     const vault = new Vault({
       name,
-      user: req.user.id  // Associate vault with the user
+      user: req.user.id
     });
     await vault.save();
     res.status(201).json(vault);
@@ -38,12 +34,14 @@ export const createVault = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
 export const addDataToVault = async (req, res) => {
   try {
     const { id } = req.params;
     const { data } = req.body;
+    const key = req.user.key; // Get encryption key from JWT
 
-    const encryptedEntries = data.map((entry) => encryptData(entry));
+    const encryptedEntries = data.map(entry => encryptData(entry, key));
     const vault = await Vault.findByIdAndUpdate(
       id,
       { $push: { entries: { $each: encryptedEntries } } },
@@ -59,29 +57,24 @@ export const addDataToVault = async (req, res) => {
   }
 };
 
-// Get all vaults for a specific user
 export const getUserVaults = async (req, res) => {
   try {
-    const vaults = await Vault.find({ user: req.user.id }); // Filter by user ID
+    const vaults = await Vault.find({ user: req.user.id });
     res.json(vaults);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get all vaults for the authenticated user
 export const getAllVaults = async (req, res) => {
   try {
-    const userId = req.user.id;  // Get the user's ID from the request
-    const vaults = await Vault.find({ user: userId });  // Fetch vaults specific to the user
+    const vaults = await Vault.find({ user: req.user.id });
     res.json(vaults);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-
-// Delete a vault by ID
 export const deleteVault = async (req, res) => {
   try {
     const { id } = req.params;
@@ -95,20 +88,18 @@ export const deleteVault = async (req, res) => {
   }
 };
 
-// Get all vaults
-
-
-// Get a vault by ID
 export const getVaultById = async (req, res) => {
   try {
     const { id } = req.params;
+    const key = req.user.key; // Get encryption key from JWT
     const vault = await Vault.findById(id);
+    
     if (!vault) {
       return res.status(404).json({ message: 'Vault not found' });
     }
     
-    // Decrypt entries before sending
-    const decryptedEntries = vault.entries.map((entry) => decryptData(entry));
+    // Decrypt entries using user's key
+    const decryptedEntries = vault.entries.map(entry => decryptData(entry, key));
     res.json({ ...vault.toObject(), entries: decryptedEntries });
   } catch (error) {
     res.status(500).json({ message: error.message });
