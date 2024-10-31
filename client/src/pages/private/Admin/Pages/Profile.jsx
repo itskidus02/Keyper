@@ -1,5 +1,3 @@
-"use client";
-
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -27,12 +25,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { toast, Toaster } from "sonner";
+import { toast , Toaster} from "sonner";
 
 export default function Profile() {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
-  const [updateSuccess, setUpdateSuccess] = useState(false);
   const [isDeletePopoverOpen, setIsDeletePopoverOpen] = useState(false);
 
   const { currentUser, loading, error } = useSelector((state) => {
@@ -49,9 +46,12 @@ export default function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) {
-      console.error("No current user found");
+      toast.error("No current user found");
       return;
     }
+
+    const loadingToast = toast.loading("Updating profile...");
+
     try {
       dispatch(updateUserStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
@@ -62,46 +62,84 @@ export default function Profile() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
+
       if (data.success === false) {
         dispatch(updateUserFailure(data));
+        toast.dismiss(loadingToast);
+        toast.error(data.message || "Failed to update profile");
         return;
       }
+
       dispatch(updateUserSuccess(data));
-      setUpdateSuccess(true);
-      toast.success("User is updated successfully!");
+      toast.dismiss(loadingToast);
+      toast.success("Profile updated successfully!", {
+        description: "Your changes have been saved.",
+      });
+
+      if (formData.password) {
+        const passwordInput = document.getElementById("password");
+        if (passwordInput) passwordInput.value = "";
+      }
     } catch (error) {
       dispatch(updateUserFailure(error));
+      toast.dismiss(loadingToast);
+      toast.error("An error occurred while updating your profile", {
+        description: error instanceof Error ? error.message : "Please try again later",
+      });
     }
   };
 
   const handleDeleteAccount = async () => {
     if (!currentUser) {
-      console.error("No current user found");
+      toast.error("No current user found");
       return;
     }
+
+    const loadingToast = toast.loading("Deleting account...");
+
     try {
       dispatch(deleteUserStart());
       const res = await fetch(`/api/user/delete/${currentUser._id}`, {
         method: "DELETE",
       });
       const data = await res.json();
+
       if (data.success === false) {
         dispatch(deleteUserFailure(data));
+        toast.dismiss(loadingToast);
+        toast.error(data.message || "Failed to delete account");
         return;
       }
+
       dispatch(deleteUserSuccess(data));
       setIsDeletePopoverOpen(false);
+      toast.dismiss(loadingToast);
+      toast.success("Account deleted successfully", {
+        description: "We're sorry to see you go!",
+      });
     } catch (error) {
       dispatch(deleteUserFailure(error));
+      toast.dismiss(loadingToast);
+      toast.error("An error occurred while deleting your account", {
+        description: error instanceof Error ? error.message : "Please try again later",
+      });
     }
   };
 
   const handleSignOut = async () => {
+    const loadingToast = toast.loading("Signing out...");
+
     try {
       await fetch("/api/auth/signout");
       dispatch(signOut());
+      toast.dismiss(loadingToast);
+      toast.success("Signed out successfully");
     } catch (error) {
-      console.log(error);
+      toast.dismiss(loadingToast);
+      toast.error("Failed to sign out", {
+        description: "Please try again",
+      });
+      console.error(error);
     }
   };
 
@@ -121,6 +159,8 @@ export default function Profile() {
 
   return (
     <Card className="max-w-lg mx-auto">
+            <Toaster position="bottom-right" richColors />
+
       <CardHeader>
         <CardTitle className="text-3xl font-semibold text-center">
           Profile
@@ -151,8 +191,8 @@ export default function Profile() {
             className="bg-slate-100 rounded-lg p-3"
             onChange={handleChange}
           />
-          <Button className="w-full">
-            {loading ? "Loading..." : "Update"}
+          <Button disabled={loading} className="w-full">
+            {loading ? "Updating..." : "Update"}
           </Button>
         </form>
       </CardContent>
@@ -202,7 +242,6 @@ export default function Profile() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      {updateSuccess && <Toaster />}
     </Card>
   );
 }
