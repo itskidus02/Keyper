@@ -7,6 +7,8 @@ function VaultPage() {
   const [fields, setFields] = useState([{ value: "" }]);
   const [vaultName, setVaultName] = useState("");
   const [entries, setEntries] = useState([]); // State for decrypted entries
+  const [createdAt, setCreatedAt] = useState(""); // State for creation date
+  const [updatedAt, setUpdatedAt] = useState(""); // State for last update date
 
   // Fetch vault details on component mount
   useEffect(() => {
@@ -15,6 +17,8 @@ function VaultPage() {
         const response = await axios.get(`/api/vaults/get/${vaultId}`);
         setVaultName(response.data.name);
         setEntries(response.data.entries); // Set decrypted entries
+        setCreatedAt(response.data.createdAt); // Set creation date
+        setUpdatedAt(response.data.updatedAt); // Set last update date
       } catch (error) {
         console.error("Error fetching vault details:", error);
       }
@@ -52,6 +56,8 @@ function VaultPage() {
   return (
     <div>
       <h2>Vault: {vaultName} (ID: {vaultId})</h2>
+      <p>Created At: {new Date(createdAt).toLocaleString()}</p>
+      {/* <p>Last Updated At: {new Date(updatedAt).toLocaleString()}</p> */}
 
       <h3>Decrypted Entries:</h3>
       <ul>
