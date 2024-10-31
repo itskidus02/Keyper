@@ -15,7 +15,14 @@ const vaultSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  entries: [String],  // Array to store encrypted entries
+  entries: [{
+    name: String,
+    value: String,
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 });
 
 const Vault = mongoose.model('Vault', vaultSchema);

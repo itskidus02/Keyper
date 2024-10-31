@@ -1,7 +1,6 @@
 import Vault from '../models/vault.model.js';
 import crypto from 'crypto';
 
-// Helper function for AES encryption
 const encryptData = (text, key) => {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key, 'hex'), iv);
@@ -10,7 +9,6 @@ const encryptData = (text, key) => {
   return `${iv.toString('hex')}:${encrypted.toString('hex')}`;
 };
 
-// Helper function for AES decryption
 const decryptData = (text, key) => {
   const [ivHex, encryptedText] = text.split(':');
   const iv = Buffer.from(ivHex, 'hex');
@@ -39,9 +37,14 @@ export const addDataToVault = async (req, res) => {
   try {
     const { id } = req.params;
     const { data } = req.body;
-    const key = req.user.key; // Get encryption key from JWT
+    const key = req.user.key;
 
-    const encryptedEntries = data.map(entry => encryptData(entry, key));
+    const encryptedEntries = data.map(entry => ({
+      name: entry.name,
+      value: encryptData(entry.value, key),
+      createdAt: new Date()
+    }));
+
     const vault = await Vault.findByIdAndUpdate(
       id,
       { $push: { entries: { $each: encryptedEntries } } },
@@ -66,15 +69,6 @@ export const getUserVaults = async (req, res) => {
   }
 };
 
-export const getAllVaults = async (req, res) => {
-  try {
-    const vaults = await Vault.find({ user: req.user.id });
-    res.json(vaults);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 export const deleteVault = async (req, res) => {
   try {
     const { id } = req.params;
@@ -91,16 +85,23 @@ export const deleteVault = async (req, res) => {
 export const getVaultById = async (req, res) => {
   try {
     const { id } = req.params;
-    const key = req.user.key; // Get encryption key from JWT
+    const key = req.user.key;
     const vault = await Vault.findById(id);
     
     if (!vault) {
       return res.status(404).json({ message: 'Vault not found' });
     }
     
-    // Decrypt entries using user's key
-    const decryptedEntries = vault.entries.map(entry => decryptData(entry, key));
-    res.json({ ...vault.toObject(), entries: decryptedEntries });
+    const decryptedEntries = vault.entries.map(entry => ({
+      name: entry.name,
+      value: decryptData(entry.value, key),
+      createdAt: entry.createdAt
+    }));
+
+    res.json({
+      ...vault.toObject(),
+      entries: decryptedEntries
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
