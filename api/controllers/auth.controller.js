@@ -45,12 +45,7 @@ export const signin = async (req, res, next) => {
     const expiryDate = new Date(Date.now() + 3600000); // 1 hour
 
     res
-      .cookie('access_token', token, { 
-        httpOnly: true, 
-        expires: expiryDate,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV === 'production'
-      })
+      .cookie('access_token', token, { httpOnly: true, expires: expiryDate })
       .status(200)
       .json(rest);
   } catch (error) {
@@ -58,29 +53,6 @@ export const signin = async (req, res, next) => {
   }
 };
 
-export const signout = async (req, res) => {
-  try {
-    // Clear the access token cookie
-    res.clearCookie('access_token', {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/'
-    });
-
-    // Clear any other session-related cookies
-    const cookies = req.cookies;
-    for (const cookie in cookies) {
-      res.clearCookie(cookie, {
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV === 'production',
-        path: '/'
-      });
-    }
-
-    res.status(200).json({ message: 'Signout success!' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error during signout' });
-  }
+export const signout = (req, res) => {
+  res.clearCookie('access_token').status(200).json('Signout success!');
 };
