@@ -46,7 +46,7 @@ export default function VaultPage() {
   );
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-1 space-y-1">
       <Toaster position="bottom-right" />
       
       <VaultHeader name={vaultName} createdAt={createdAt} />
