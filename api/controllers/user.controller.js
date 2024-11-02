@@ -15,34 +15,51 @@ const generateKey = (password, salt) => {
   return crypto.pbkdf2Sync(password, salt, 100000, 32, 'sha256');
 };
 
+const decryptEntry = (entry, key) => {
+  try {
+    const [ivHex, encryptedText] = entry.value.split(':');
+    const iv = Buffer.from(ivHex, 'hex');
+    const encryptedBuffer = Buffer.from(encryptedText, 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key, 'hex'), iv);
+    let decrypted = decipher.update(encryptedBuffer);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return {
+      name: entry.name,
+      value: decrypted.toString(),
+      createdAt: entry.createdAt
+    };
+  } catch (error) {
+    throw new Error(`Failed to decrypt entry: ${entry.name}`);
+  }
+};
+
+const encryptEntry = (entry, key) => {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key, 'hex'), iv);
+  let encrypted = cipher.update(entry.value);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return {
+    name: entry.name,
+    value: `${iv.toString('hex')}:${encrypted.toString('hex')}`,
+    createdAt: entry.createdAt
+  };
+};
+
 const reEncryptVaultEntries = async (userId, oldKey, newKey) => {
   const vaults = await Vault.find({ user: userId });
   
   for (const vault of vaults) {
-    const decryptedEntries = vault.entries.map(entry => {
-      try {
-        const [ivHex, encryptedText] = entry.split(':');
-        const iv = Buffer.from(ivHex, 'hex');
-        const encryptedBuffer = Buffer.from(encryptedText, 'hex');
-        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(oldKey, 'hex'), iv);
-        let decrypted = decipher.update(encryptedBuffer);
-        decrypted = Buffer.concat([decrypted, decipher.final()]);
-        return decrypted.toString();
-      } catch (error) {
-        return entry; // Keep original if decryption fails
-      }
-    });
-
-    // Re-encrypt with new key
-    const reEncryptedEntries = decryptedEntries.map(entry => {
-      const iv = crypto.randomBytes(16);
-      const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(newKey, 'hex'), iv);
-      let encrypted = cipher.update(entry);
-      encrypted = Buffer.concat([encrypted, cipher.final()]);
-      return `${iv.toString('hex')}:${encrypted.toString('hex')}`;
-    });
-
-    await Vault.findByIdAndUpdate(vault._id, { entries: reEncryptedEntries });
+    try {
+      // Decrypt all entries with old key
+      const decryptedEntries = vault.entries.map(entry => decryptEntry(entry, oldKey));
+      
+      // Re-encrypt with new key
+      const reEncryptedEntries = decryptedEntries.map(entry => encryptEntry(entry, newKey));
+      
+      await Vault.findByIdAndUpdate(vault._id, { entries: reEncryptedEntries });
+    } catch (error) {
+      throw new Error(`Failed to re-encrypt vault ${vault._id}: ${error.message}`);
+    }
   }
 };
 
@@ -53,26 +70,34 @@ export const updateUser = async (req, res, next) => {
 
   try {
     const user = await User.findById(req.params.id);
+    if (!user) {
+      return next(errorHandler(404, 'User not found'));
+    }
+
     const updateData = {
-      username: req.body.username,
-      email: req.body.email,
-      profilePicture: req.body.profilePicture,
+      username: req.body.username || user.username,
+      email: req.body.email || user.email,
+      profilePicture: req.body.profilePicture || user.profilePicture,
     };
 
     if (req.body.password) {
-      // Generate new salt and key for the new password
-      const newSalt = crypto.randomBytes(16).toString('hex');
-      const newKey = generateKey(req.body.password, newSalt);
-      
-      // Re-encrypt all vault entries with the new key
-      await reEncryptVaultEntries(
-        req.params.id,
-        req.user.key,
-        newKey.toString('hex')
-      );
+      try {
+        // Generate new salt and key for the new password
+        const newSalt = crypto.randomBytes(16).toString('hex');
+        const newKey = generateKey(req.body.password, newSalt);
+        
+        // Re-encrypt all vault entries with the new key
+        await reEncryptVaultEntries(
+          req.params.id,
+          req.user.key,
+          newKey.toString('hex')
+        );
 
-      updateData.password = newKey.toString('hex');
-      updateData.salt = newSalt;
+        updateData.password = newKey.toString('hex');
+        updateData.salt = newSalt;
+      } catch (error) {
+        return next(errorHandler(500, `Failed to update password: ${error.message}`));
+      }
     }
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -82,20 +107,28 @@ export const updateUser = async (req, res, next) => {
     );
 
     // If password was updated, create new token with new key
+    let token = null;
     if (req.body.password) {
-      const token = jwt.sign({
+      token = jwt.sign({
         id: updatedUser._id,
-        key: updateData.password // Use new key in token
+        key: updateData.password
       }, process.env.JWT_SECRET);
+    }
 
+    const { password, salt, ...rest } = updatedUser._doc;
+    
+    // Only set new cookie if password was changed
+    if (token) {
       const expiryDate = new Date(Date.now() + 3600000); // 1 hour
       res.cookie('access_token', token, { httpOnly: true, expires: expiryDate });
     }
 
-    const { password, salt, ...rest } = updatedUser._doc;
-    res.status(200).json(rest);
+    res.status(200).json({
+      ...rest,
+      message: 'Profile updated successfully'
+    });
   } catch (error) {
-    next(error);
+    next(errorHandler(500, error.message));
   }
 };
 
@@ -110,8 +143,11 @@ export const deleteUser = async (req, res, next) => {
     // Delete the user
     await User.findByIdAndDelete(req.params.id);
     
-    res.status(200).json('User and their vaults have been deleted.');
+    // Clear the authentication cookie
+    res.clearCookie('access_token');
+    
+    res.status(200).json({ message: 'User and their vaults have been deleted successfully' });
   } catch (error) {
-    next(error);
+    next(errorHandler(500, error.message));
   }
 };
