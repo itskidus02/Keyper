@@ -56,12 +56,6 @@ export function VaultTable({ entries }) {
     setShowModal(true);
   };
 
-  const maskValue = (value) => {
-    if (!value) return "•••";
-    const length = value.length;
-    return "•".repeat(Math.min(length * 1.5, 24));
-  };
-
   const formatDate = (date) => {
     return new Intl.DateTimeFormat("en-US", {
       dateStyle: "medium",
@@ -85,17 +79,12 @@ export function VaultTable({ entries }) {
             <TableRow key={entry.id}>
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
-                  {/* <Shield className="h-9 w-9 text-muted-foreground" /> */}
                   {entry.name}
                 </div>
               </TableCell>
-              <TableCell className="font-mono">
+              <TableCell>
                 <div className="flex items-center gap-2">
-                  {visibleEntries[entry.id] ? (
-                    <span className="text-emerald-600">{entry.value}</span>
-                  ) : (
-                    <span className="text-muted-foreground">{maskValue(entry.value)}</span>
-                  )}
+                  <span className="font-mono text-muted-foreground">•••••••••••</span>
                 </div>
               </TableCell>
               <TableCell className="text-muted-foreground">
@@ -113,14 +102,6 @@ export function VaultTable({ entries }) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => toggleVisibility(entry.id)}>
-                      {visibleEntries[entry.id] ? (
-                        <EyeOff className="mr-2 h-4 w-4" />
-                      ) : (
-                        <Eye className="mr-2 h-4 w-4" />
-                      )}
-                      {visibleEntries[entry.id] ? "Hide" : "Show"} Value
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => copyToClipboard(entry.value)}>
                       <Copy className="mr-2 h-4 w-4" />
                       Copy to Clipboard
