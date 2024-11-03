@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -23,13 +23,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, EyeOff, Copy, MoreVertical, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function VaultTable({ entries }) {
   const [visibleEntries, setVisibleEntries] = useState({});
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const contentRef = useRef(null);
+  const [needsScroll, setNeedsScroll] = useState(false);
 
   const toggleVisibility = (id) => {
     setVisibleEntries((prev) => ({
@@ -62,6 +66,35 @@ export function VaultTable({ entries }) {
       timeStyle: "short",
     }).format(new Date(date));
   };
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (contentRef.current) {
+        const height = contentRef.current.scrollHeight;
+        setNeedsScroll(height > 200);
+      }
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [selectedEntry, visibleEntries]);
+
+  const secureContent = selectedEntry && (
+    <pre
+      ref={contentRef}
+      className={cn(
+        "whitespace-pre-wrap break-all font-mono text-sm leading-relaxed",
+        visibleEntries[selectedEntry.id] 
+          ? "text-foreground" 
+          : "text-muted-foreground tracking-wider"
+      )}
+    >
+      {visibleEntries[selectedEntry.id] 
+        ? selectedEntry.value 
+        : "•".repeat(Math.min(selectedEntry.value.length, 50))}
+    </pre>
+  );
 
   return (
     <>
@@ -130,49 +163,65 @@ export function VaultTable({ entries }) {
       </Table>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
+        <DialogContent className="max-h-[90vh] gap-0 overflow-hidden p-0 sm:max-w-[600px]">
+          <DialogHeader className="p-6 pb-4">
             <DialogTitle>Secure Value View</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Entry Name</Label>
-              <Input
-                readOnly
-                value={selectedEntry?.name || ""}
-                className="font-medium"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Secure Value</Label>
-              <div className="flex gap-2">
-                <Input
-                  type={visibleEntries[selectedEntry?.id] ? "text" : "password"}
-                  readOnly
-                  value={selectedEntry?.value || ""}
-                  className="font-mono"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => selectedEntry && toggleVisibility(selectedEntry.id)}
-                >
-                  {visibleEntries[selectedEntry?.id] ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => selectedEntry && copyToClipboard(selectedEntry.value)}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
+          <ScrollArea className="border-t">
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Entry Name</Label>
+                  <Input
+                    readOnly
+                    value={selectedEntry?.name || ""}
+                    className="font-medium"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Secure Value</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => selectedEntry && toggleVisibility(selectedEntry.id)}
+                      >
+                        {selectedEntry && visibleEntries[selectedEntry.id] ? (
+                          <>
+                            <EyeOff className="mr-2 h-4 w-4" />
+                            Hide Value
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Show Value
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => selectedEntry && copyToClipboard(selectedEntry.value)}
+                      >
+                        <Copy className="mr-2 h-4 w-4" />
+                        Copy
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="relative rounded-md border bg-muted/50">
+                    {needsScroll ? (
+                      <ScrollArea className="h-[200px] w-full">
+                        <div className="p-3">{secureContent}</div>
+                      </ScrollArea>
+                    ) : (
+                      <div className="p-3">{secureContent}</div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     </>
