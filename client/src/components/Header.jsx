@@ -7,7 +7,7 @@ export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   
   return (
-    <header className='sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+    <header className='sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
       <div className='flex h-14 items-center justify-between max-w-6xl mx-auto px-4'>
         <Link className="flex items-center gap-3" to='/'>
           <img src={logo} className='w-10 h-8' alt="LockBox Logo" />
