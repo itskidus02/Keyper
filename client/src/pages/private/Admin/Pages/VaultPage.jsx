@@ -118,6 +118,7 @@ export default function VaultPage() {
     return pageNumbers;
   };
 
+  
   return (
     <div className="container mx-auto py-1 space-y-1">
       <Toaster position="bottom-right" />
