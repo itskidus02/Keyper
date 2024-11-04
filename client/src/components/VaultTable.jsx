@@ -70,19 +70,24 @@ export function VaultTable({ entries }) {
   const renderSeedPhrase = (value) => {
     const words = value.split(" ");
     return (
-      <div className="grid grid-cols-3 gap-2 p-4">
+      <div className="grid grid-cols-3 gap-3 p-4">
         {words.map((word, index) => (
           <div
             key={index}
-            className="flex items-center justify-between bg-muted/30 rounded-md p-2"
+            className="flex items-center justify-between border rounded-md p-2.5 bg-background/50"
           >
-            <span className="text-sm font-mono">
-              {index + 1}. {visibleEntries[selectedEntry?.id] ? word : "•".repeat(6)}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground font-medium min-w-[1.5rem]">
+                {index + 1}.
+              </span>
+              <span className="font-mono text-sm">
+                {visibleEntries[selectedEntry?.id] ? word : "•".repeat(6)}
+              </span>
+            </div>
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6"
+              className="h-6 w-6 ml-2 hover:bg-background"
               onClick={() => copyToClipboard(word)}
             >
               <Copy className="h-3 w-3" />
@@ -97,7 +102,7 @@ export function VaultTable({ entries }) {
     const checkOverflow = () => {
       if (contentRef.current) {
         const height = contentRef.current.scrollHeight;
-        setNeedsScroll(height > 200);
+        setNeedsScroll(height > 400);
       }
     };
 
@@ -213,7 +218,7 @@ export function VaultTable({ entries }) {
               {selectedEntry?.type === "seed" ? "Seed Phrase View" : "Secure Value View"}
             </DialogTitle>
           </DialogHeader>
-          <ScrollArea className="border-t">
+          <div className="border-t">
             <div className="p-6">
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -224,8 +229,8 @@ export function VaultTable({ entries }) {
                     className="font-medium"
                   />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
                     <Label>
                       {selectedEntry?.type === "seed" ? "Seed Phrase" : "Secure Value"}
                     </Label>
@@ -269,7 +274,7 @@ export function VaultTable({ entries }) {
                 </div>
               </div>
             </div>
-          </ScrollArea>
+          </div>
         </DialogContent>
       </Dialog>
     </>
