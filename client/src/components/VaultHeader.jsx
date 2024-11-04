@@ -4,7 +4,7 @@ export function VaultHeader({ name, createdAt }) {
   return (
     <Card className="-mb-5">
       <CardHeader>
-        <CardTitle className="text-4xl uppercase">{name} vault</CardTitle>
+        <CardTitle className="text-4xl text-muted-foreground uppercase">{name} vault</CardTitle>
       </CardHeader>
    
     </Card>

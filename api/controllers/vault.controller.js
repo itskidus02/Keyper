@@ -19,6 +19,27 @@ const decryptData = (text, key) => {
   return decrypted.toString();
 };
 
+const validateEntry = (entry) => {
+  if (!entry.name || typeof entry.name !== 'string') {
+    throw new Error('Invalid entry name');
+  }
+
+  if (!entry.type || !['password', 'seed'].includes(entry.type)) {
+    throw new Error('Invalid entry type');
+  }
+
+  if (!entry.value || typeof entry.value !== 'string') {
+    throw new Error('Invalid entry value');
+  }
+
+  if (entry.type === 'seed') {
+    const wordCount = entry.value.split(' ').length;
+    if (![12, 15, 18, 21, 24].includes(wordCount)) {
+      throw new Error('Invalid seed phrase word count');
+    }
+  }
+};
+
 export const createVault = async (req, res) => {
   try {
     const { name } = req.body;
@@ -39,11 +60,15 @@ export const addDataToVault = async (req, res) => {
     const { data } = req.body;
     const key = req.user.key;
 
-    const encryptedEntries = data.map(entry => ({
-      name: entry.name,
-      value: encryptData(entry.value, key),
-      createdAt: new Date()
-    }));
+    const encryptedEntries = data.map(entry => {
+      validateEntry(entry);
+      return {
+        name: entry.name,
+        type: entry.type,
+        value: encryptData(entry.value, key),
+        createdAt: new Date()
+      };
+    });
 
     const vault = await Vault.findByIdAndUpdate(
       id,
@@ -56,7 +81,7 @@ export const addDataToVault = async (req, res) => {
     }
     res.status(200).json({ message: "Data added successfully", vault });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -94,6 +119,7 @@ export const getVaultById = async (req, res) => {
     
     const decryptedEntries = vault.entries.map(entry => ({
       name: entry.name,
+      type: entry.type,
       value: decryptData(entry.value, key),
       createdAt: entry.createdAt
     }));

@@ -17,6 +17,11 @@ const vaultSchema = new mongoose.Schema({
   },
   entries: [{
     name: String,
+    type: {
+      type: String,
+      enum: ['password', 'seed'],
+      default: 'password'
+    },
     value: String,
     createdAt: {
       type: Date,

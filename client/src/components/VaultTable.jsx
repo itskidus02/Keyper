@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Eye, EyeOff, Copy, MoreVertical, Shield } from "lucide-react";
+import { Eye, EyeOff, Copy, MoreVertical, Shield, Key } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -67,6 +67,32 @@ export function VaultTable({ entries }) {
     }).format(new Date(date));
   };
 
+  const renderSeedPhrase = (value) => {
+    const words = value.split(" ");
+    return (
+      <div className="grid grid-cols-3 gap-2 p-4">
+        {words.map((word, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-between bg-muted/30 rounded-md p-2"
+          >
+            <span className="text-sm font-mono">
+              {index + 1}. {visibleEntries[selectedEntry?.id] ? word : "•".repeat(6)}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => copyToClipboard(word)}
+            >
+              <Copy className="h-3 w-3" />
+            </Button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   useEffect(() => {
     const checkOverflow = () => {
       if (contentRef.current) {
@@ -81,19 +107,24 @@ export function VaultTable({ entries }) {
   }, [selectedEntry, visibleEntries]);
 
   const secureContent = selectedEntry && (
-    <pre
-      ref={contentRef}
-      className={cn(
-        "whitespace-pre-wrap break-all font-mono text-sm leading-relaxed",
-        visibleEntries[selectedEntry.id] 
-          ? "text-foreground" 
-          : "text-muted-foreground tracking-wider"
+    <div ref={contentRef}>
+      {selectedEntry.type === "seed" ? (
+        renderSeedPhrase(selectedEntry.value)
+      ) : (
+        <pre
+          className={cn(
+            "whitespace-pre-wrap break-all font-mono text-sm leading-relaxed p-3",
+            visibleEntries[selectedEntry.id] 
+              ? "text-foreground" 
+              : "text-muted-foreground tracking-wider"
+          )}
+        >
+          {visibleEntries[selectedEntry.id] 
+            ? selectedEntry.value 
+            : "•".repeat(Math.min(selectedEntry.value.length, 50))}
+        </pre>
       )}
-    >
-      {visibleEntries[selectedEntry.id] 
-        ? selectedEntry.value 
-        : "•".repeat(Math.min(selectedEntry.value.length, 50))}
-    </pre>
+    </div>
   );
 
   return (
@@ -102,6 +133,7 @@ export function VaultTable({ entries }) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[200px]">Name</TableHead>
+            <TableHead>Type</TableHead>
             <TableHead>Value</TableHead>
             <TableHead className="w-[200px]">Created At</TableHead>
             <TableHead className="w-[70px]"></TableHead>
@@ -113,6 +145,18 @@ export function VaultTable({ entries }) {
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
                   {entry.name}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  {entry.type === "seed" ? (
+                    <Key className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Shield className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <span className="capitalize text-sm text-muted-foreground">
+                    {entry.type}
+                  </span>
                 </div>
               </TableCell>
               <TableCell>
@@ -152,7 +196,7 @@ export function VaultTable({ entries }) {
           {entries.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={4}
+                colSpan={5}
                 className="h-24 text-center text-muted-foreground"
               >
                 No secure entries found
@@ -163,9 +207,11 @@ export function VaultTable({ entries }) {
       </Table>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-h-[90vh] gap-0 overflow-hidden p-0 sm:max-w-[600px]">
+        <DialogContent className="max-h-[90vh] gap-0 overflow-hidden p-0 sm:max-w-[700px]">
           <DialogHeader className="p-6 pb-4">
-            <DialogTitle>Secure Value View</DialogTitle>
+            <DialogTitle>
+              {selectedEntry?.type === "seed" ? "Seed Phrase View" : "Secure Value View"}
+            </DialogTitle>
           </DialogHeader>
           <ScrollArea className="border-t">
             <div className="p-6">
@@ -180,7 +226,9 @@ export function VaultTable({ entries }) {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label>Secure Value</Label>
+                    <Label>
+                      {selectedEntry?.type === "seed" ? "Seed Phrase" : "Secure Value"}
+                    </Label>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -205,17 +253,17 @@ export function VaultTable({ entries }) {
                         onClick={() => selectedEntry && copyToClipboard(selectedEntry.value)}
                       >
                         <Copy className="mr-2 h-4 w-4" />
-                        Copy
+                        Copy All
                       </Button>
                     </div>
                   </div>
                   <div className="relative rounded-md border bg-muted/50">
                     {needsScroll ? (
-                      <ScrollArea className="h-[200px] w-full">
-                        <div className="p-3">{secureContent}</div>
+                      <ScrollArea className="h-[400px] w-full">
+                        {secureContent}
                       </ScrollArea>
                     ) : (
-                      <div className="p-3">{secureContent}</div>
+                      secureContent
                     )}
                   </div>
                 </div>
