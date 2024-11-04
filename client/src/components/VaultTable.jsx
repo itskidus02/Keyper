@@ -134,6 +134,9 @@ export function VaultTable({ entries }) {
 
   return (
     <>
+    <div className="border-zinc-200 rounded-md border">
+
+ 
       <Table>
         <TableHeader>
           <TableRow>
@@ -277,6 +280,7 @@ export function VaultTable({ entries }) {
           </div>
         </DialogContent>
       </Dialog>
+      </div>
     </>
   );
 }
