@@ -1,11 +1,12 @@
 import { cn } from "@/lib/utils";
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
 import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 
 export function AnimatedGridPatternDemo() {
   return (
     <div className="relative flex justify-center h-screen w-full p-2">
-      <div className="z-10 whitespace-pre-wrap mt-[10rem] text-center text-5xl font-medium tracking-tighter text-black dark:text-white">
+      <div className="z-10 whitespace-pre-wrap mt-[10rem] text-center text-5xl font-medium tracking-tight text-black dark:text-white">
         <h1 className="text-4xl md:text-6xl lg:text-9xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-8 duration-700">
           <span className="text-primary ">Secure.</span>{" "}
           <span className="text-primary">Simple.</span>{" "}
@@ -18,12 +19,17 @@ export function AnimatedGridPatternDemo() {
           effortless password management for ultimate peace of mind.
         </p>
         <div className="flex flex-col justify-center mt-[2rem] sm:flex-row gap-4 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-16 duration-700">
-          <Button variant="gooeyLeft"
-            size="lg"
-            className="w-full sm:w-auto transition-all duration-300 text-white bg-gradient-to-r from-blue-600 to-cyan-600 "
-          >
-            Dashboard
-          </Button>
+        <Link to="/admin">
+            <Button
+              variant="gooeyLeft"
+              size="lg"
+              className="w-full sm:w-auto transition-all duration-300 text-white bg-gradient-to-r from-blue-600 to-cyan-600"
+            >
+              Dashboard
+            </Button>
+          </Link>
+          <Link to="/admin">
+
           <Button
             size="lg"
             variant="gooeyLeft"
@@ -31,6 +37,8 @@ export function AnimatedGridPatternDemo() {
           >
             See How It Works
           </Button>
+          </Link>
+
         </div>
       </div>
       <AnimatedGridPattern
