@@ -23,7 +23,7 @@ export function AnimatedGridPatternDemo() {
             <Button
               variant="gooeyLeft"
               size="lg"
-              className="w-full sm:w-auto transition-all duration-300 text-white bg-gradient-to-r from-blue-600 to-cyan-600"
+              className="w-full sm:w-auto transition-all duration-300 text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-400 hover:to-cyan-600"
             >
               Dashboard
             </Button>
