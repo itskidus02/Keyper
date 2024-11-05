@@ -35,7 +35,7 @@ export default function Header() {
               <img 
                 src={currentUser.profilePicture} 
                 alt='profile' 
-                className='h-10 w-10 rounded-full object-cover transition-all' 
+                className='h-7 w-7 rounded-full object-cover transition-all' 
               />
             ) : (
               <span className='text-sm font-medium transition-colors hover:text-primary'>Sign In</span>

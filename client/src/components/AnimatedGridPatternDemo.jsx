@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 export function AnimatedGridPatternDemo() {
   return (
     <div className="relative flex justify-center h-screen w-full p-2">
-      <div className="z-10 whitespace-pre-wrap mt-[10rem] text-center text-5xl font-medium tracking-tight text-black dark:text-white">
+      <div className="z-10 whitespace-pre-wrap mt-[10rem] text-center text-5xl font-medium tracking-tight space-y-1 text-black dark:text-white">
         <h1 className="text-4xl md:text-6xl lg:text-9xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-8 duration-700">
           <span className="text-primary ">Secure.</span>{" "}
           <span className="text-primary">Simple.</span>{" "}
