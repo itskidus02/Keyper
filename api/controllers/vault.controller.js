@@ -107,6 +107,37 @@ export const deleteVault = async (req, res) => {
   }
 };
 
+export const deleteVaultEntry = async (req, res) => {
+  try {
+    const { vaultId, entryId } = req.params;
+    
+    const vault = await Vault.findById(vaultId);
+    if (!vault) {
+      return res.status(404).json({ message: 'Vault not found' });
+    }
+
+    // Check if user owns the vault
+    if (vault.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Unauthorized access' });
+    }
+
+    // Remove the entry from the entries array
+    const result = await Vault.findByIdAndUpdate(
+      vaultId,
+      { $pull: { entries: { _id: entryId } } },
+      { new: true }
+    );
+
+    if (!result) {
+      return res.status(404).json({ message: 'Entry not found' });
+    }
+
+    res.json({ message: 'Entry deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const getVaultById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -118,6 +149,7 @@ export const getVaultById = async (req, res) => {
     }
     
     const decryptedEntries = vault.entries.map(entry => ({
+      id: entry._id,
       name: entry.name,
       type: entry.type,
       value: decryptData(entry.value, key),

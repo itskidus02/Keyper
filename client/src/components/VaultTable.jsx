@@ -12,6 +12,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -24,14 +26,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Eye, EyeOff, Copy, MoreVertical, Shield, Key } from "lucide-react";
+import { Eye, EyeOff, Copy, MoreVertical, Shield, Key, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export function VaultTable({ entries }) {
+export function VaultTable({ entries, onDeleteEntry }) {
   const [visibleEntries, setVisibleEntries] = useState({});
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const contentRef = useRef(null);
   const [needsScroll, setNeedsScroll] = useState(false);
 
@@ -58,6 +62,30 @@ export function VaultTable({ entries }) {
   const openSecureView = (entry) => {
     setSelectedEntry(entry);
     setShowModal(true);
+  };
+
+  const openDeleteModal = (entry) => {
+    setSelectedEntry(entry);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedEntry) return;
+    
+    setIsDeleting(true);
+    try {
+      await onDeleteEntry(selectedEntry.id);
+      toast.success("Entry deleted successfully", {
+        description: "The entry has been permanently removed from your vault",
+      });
+      setShowDeleteModal(false);
+    } catch (error) {
+      toast.error("Failed to delete entry", {
+        description: error.message || "Please try again or contact support if the issue persists",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const formatDate = (date) => {
@@ -134,152 +162,184 @@ export function VaultTable({ entries }) {
 
   return (
     <>
-    <div className="border-zinc-200 rounded-md border">
-
- 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[200px]">Name</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Value</TableHead>
-            <TableHead className="w-[200px]">Created At</TableHead>
-            <TableHead className="w-[70px]"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {entries.map((entry) => (
-            <TableRow key={entry.id}>
-              <TableCell className="font-medium">
-                <div className="flex items-center gap-2">
-                  {entry.name}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  {entry.type === "seed" ? (
-                    <Key className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <Shield className="h-4 w-4 text-muted-foreground" />
-                  )}
-                  <span className="capitalize text-sm text-muted-foreground">
-                    {entry.type}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-muted-foreground">•••••••••••</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {formatDate(entry.createdAt)}
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="hover:bg-muted focus:bg-muted"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => copyToClipboard(entry.value)}>
-                      <Copy className="mr-2 h-4 w-4" />
-                      Copy to Clipboard
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => openSecureView(entry)}>
-                      <Shield className="mr-2 h-4 w-4" />
-                      Secure View
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-          {entries.length === 0 && (
+      <div className="border-zinc-200 rounded-md border">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell
-                colSpan={5}
-                className="h-24 text-center text-muted-foreground"
-              >
-                No secure entries found
-              </TableCell>
+              <TableHead className="w-[200px]">Name</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Value</TableHead>
+              <TableHead className="w-[200px]">Created At</TableHead>
+              <TableHead className="w-[70px]"></TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-h-[90vh] gap-0 overflow-hidden p-0 sm:max-w-[700px]">
-          <DialogHeader className="p-6 pb-4">
-            <DialogTitle>
-              {selectedEntry?.type === "seed" ? "Seed Phrase View" : "Secure Value View"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="border-t">
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Entry Name</Label>
-                  <Input
-                    readOnly
-                    value={selectedEntry?.name || ""}
-                    className="font-medium"
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <Label>
-                      {selectedEntry?.type === "seed" ? "Seed Phrase" : "Secure Value"}
-                    </Label>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => selectedEntry && toggleVisibility(selectedEntry.id)}
-                      >
-                        {selectedEntry && visibleEntries[selectedEntry.id] ? (
-                          <>
-                            <EyeOff className="mr-2 h-4 w-4" />
-                            Hide Value
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="mr-2 h-4 w-4" />
-                            Show Value
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => selectedEntry && copyToClipboard(selectedEntry.value)}
-                      >
-                        <Copy className="mr-2 h-4 w-4" />
-                        Copy All
-                      </Button>
-                    </div>
+          </TableHeader>
+          <TableBody>
+            {entries.map((entry) => (
+              <TableRow key={entry.id}>
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    {entry.name}
                   </div>
-                  <div className="relative rounded-md border bg-muted/50">
-                    {needsScroll ? (
-                      <ScrollArea className="h-[400px] w-full">
-                        {secureContent}
-                      </ScrollArea>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {entry.type === "seed" ? (
+                      <Key className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      secureContent
+                      <Shield className="h-4 w-4 text-muted-foreground" />
                     )}
+                    <span className="capitalize text-sm text-muted-foreground">
+                      {entry.type}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-muted-foreground">•••••••••••</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {formatDate(entry.createdAt)}
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-muted focus:bg-muted"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem onClick={() => copyToClipboard(entry.value)}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        Copy to Clipboard
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => openSecureView(entry)}>
+                        <Shield className="mr-2 h-4 w-4" />
+                        Secure View
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => openDeleteModal(entry)}
+                        className="text-red-600 focus:text-red-600"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Entry
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+            {entries.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  No secure entries found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+
+        <Dialog open={showModal} onOpenChange={setShowModal}>
+          <DialogContent className="max-h-[90vh] gap-0 overflow-hidden p-0 sm:max-w-[700px]">
+            <DialogHeader className="p-6 pb-4">
+              <DialogTitle>
+                {selectedEntry?.type === "seed" ? "Seed Phrase View" : "Secure Value View"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="border-t">
+              <div className="p-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Entry Name</Label>
+                    <Input
+                      readOnly
+                      value={selectedEntry?.name || ""}
+                      className="font-medium"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <Label>
+                        {selectedEntry?.type === "seed" ? "Seed Phrase" : "Secure Value"}
+                      </Label>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => selectedEntry && toggleVisibility(selectedEntry.id)}
+                        >
+                          {selectedEntry && visibleEntries[selectedEntry.id] ? (
+                            <>
+                              <EyeOff className="mr-2 h-4 w-4" />
+                              Hide Value
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="mr-2 h-4 w-4" />
+                              Show Value
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => selectedEntry && copyToClipboard(selectedEntry.value)}
+                        >
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy All
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="relative rounded-md border bg-muted/50">
+                      {needsScroll ? (
+                        <ScrollArea className="h-[400px] w-full">
+                          {secureContent}
+                        </ScrollArea>
+                      ) : (
+                        secureContent
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Entry</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete "{selectedEntry?.name}"? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete Entry"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );

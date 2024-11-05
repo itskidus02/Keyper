@@ -32,7 +32,6 @@ export default function VaultPage() {
   }, [vaultId]);
 
   useEffect(() => {
-    // Reset to first page when search query changes
     setCurrentPage(1);
   }, [searchQuery]);
 
@@ -55,6 +54,19 @@ export default function VaultPage() {
       fetchVaultDetails();
     } catch (error) {
       console.error("Error saving data:", error);
+      throw error;
+    }
+  };
+
+  const handleDeleteEntry = async (entryId) => {
+    try {
+      await axios.delete(`/api/vaults/${vaultId}/entries/${entryId}`);
+      // Update the local state to remove the deleted entry
+      setEntries(entries.filter(entry => entry.id !== entryId));
+      return true;
+    } catch (error) {
+      console.error("Error deleting entry:", error);
+      throw new Error(error.response?.data?.message || "Failed to delete entry");
     }
   };
 
@@ -65,59 +77,48 @@ export default function VaultPage() {
   const totalPages = Math.ceil(filteredEntries.length / ITEMS_PER_PAGE);
   const showPagination = filteredEntries.length > ITEMS_PER_PAGE;
 
-  // Calculate the entries to display for the current page
   const paginatedEntries = filteredEntries.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  // Generate page numbers to display
   const getPageNumbers = () => {
     const pageNumbers = [];
-    const maxVisiblePages = 5; // Show max 5 page numbers
+    const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
-      // If total pages is less than max visible, show all pages
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
       }
     } else {
-      // Always show first page
       pageNumbers.push(1);
 
-      // Calculate start and end of visible pages
       let start = Math.max(2, currentPage - 1);
       let end = Math.min(totalPages - 1, currentPage + 1);
 
-      // Adjust if we're near the start or end
       if (currentPage <= 2) {
         end = 4;
       } else if (currentPage >= totalPages - 1) {
         start = totalPages - 3;
       }
 
-      // Add ellipsis if needed
       if (start > 2) {
         pageNumbers.push("...");
       }
 
-      // Add visible page numbers
       for (let i = start; i <= end; i++) {
         pageNumbers.push(i);
       }
 
-      // Add ellipsis if needed
       if (end < totalPages - 1) {
         pageNumbers.push("...");
       }
 
-      // Always show last page
       pageNumbers.push(totalPages);
     }
 
     return pageNumbers;
   };
-
 
   return (
     <div className="container h-screen mx-auto py-1 space-y-1">
@@ -134,7 +135,10 @@ export default function VaultPage() {
           <AddEntryDialog onSave={handleAddEntry} />
         </CardHeader>
         <CardContent className="space-y-4">
-          <VaultTable entries={paginatedEntries} />
+          <VaultTable 
+            entries={paginatedEntries} 
+            onDeleteEntry={handleDeleteEntry}
+          />
           
           {showPagination && (
             <Pagination className="justify-center">

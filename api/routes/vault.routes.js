@@ -3,6 +3,7 @@ import {
   addDataToVault,
   createVault,
   deleteVault,
+  deleteVaultEntry,
   getUserVaults,
   getVaultById,
 } from '../controllers/vault.controller.js';
@@ -22,5 +23,8 @@ router.get('/get/:id', verifyToken, getVaultById);
 
 // Delete a vault by ID
 router.delete('/delete/:id', verifyToken, deleteVault);
+
+// Delete an entry from a vault
+router.delete('/:vaultId/entries/:entryId', verifyToken, deleteVaultEntry);
 
 export default router;
