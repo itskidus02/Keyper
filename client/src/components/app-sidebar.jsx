@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { deleteVault, createVault } from '../redux/vault/vaultSlice';
 import { Wrench, Settings2, Plus, Trash, ChevronDown, ChevronUp, Vault } from "lucide-react";
 import logo from "../assets/images/logo.png";
+import wlogo from "../assets/images/wlogo.png";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -20,8 +21,11 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
 
 export function AppSidebar({ ...props }) {
+  const { resolvedTheme } = useTheme(); // Get the current theme (light or dark)
+  const currentLogo = resolvedTheme === "dark" ? wlogo : logo;
   const dispatch = useDispatch();
   const vaults = useSelector((state) => state.vault.vaults); 
   const [newVaultName, setNewVaultName] = useState("");
@@ -61,7 +65,7 @@ export function AppSidebar({ ...props }) {
 
   const data = {
     user: { name: "shadcn", email: "m@example.com", avatar: "/avatars/shadcn.jpg" },
-    teams: [{ name: "LockBox", logo: logo, plan: "Enterprise", url: "/" }],
+    teams: [{ name: "LockBox", logo: currentLogo, plan: "Enterprise", url: "/" }],
     navMain: [
       {
         title: "Tools",
