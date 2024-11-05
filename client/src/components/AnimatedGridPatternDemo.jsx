@@ -13,7 +13,7 @@ export function AnimatedGridPatternDemo() {
             Safe.
           </span>
         </h1>{" "}
-        <p className="text-lg flex  md:text-xl text-muted-foreground max-w-2xl animate-in fade-in slide-in-from-bottom-12 duration-700">
+        <p className="text-lg text-center mx-auto md:text-xl text-muted-foreground max-w-2xl animate-in fade-in slide-in-from-bottom-12 duration-700">
           Your digital fortress in an uncertain world. Advanced encryption meets
           effortless password management for ultimate peace of mind.
         </p>
