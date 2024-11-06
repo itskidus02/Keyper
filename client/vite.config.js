@@ -21,7 +21,8 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   build: {
-    outDir: 'public',
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         manualChunks: {
