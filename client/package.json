@@ -34,6 +34,7 @@
     "firebase": "^10.1.0",
     "framer-motion": "^11.11.11",
     "lucide-react": "^0.453.0",
+    "mern-auth": "file:..",
     "next-themes": "^0.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
