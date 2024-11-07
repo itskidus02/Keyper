@@ -18,10 +18,18 @@ export const deleteVault = createAsyncThunk('vault/deleteVault', async (vaultId)
   return vaultId;
 });
 
+// Thunk to fetch dashboard stats
+export const fetchDashboardStats = createAsyncThunk('vault/fetchDashboardStats', async () => {
+  const response = await axios.get('/api/vaults/dashboard-stats', { withCredentials: true });
+  console.log(response.data);
+  return response.data;
+});
+
 const vaultSlice = createSlice({
   name: 'vault',
   initialState: {
     vaults: [],
+    dashboardStats: null, // Add state for dashboard stats
     status: 'idle',
     error: null,
   },
@@ -37,6 +45,9 @@ const vaultSlice = createSlice({
       })
       .addCase(deleteVault.fulfilled, (state, action) => {
         state.vaults = state.vaults.filter((vault) => vault._id !== action.payload);
+      })
+      .addCase(fetchDashboardStats.fulfilled, (state, action) => {
+        state.dashboardStats = action.payload;
       });
   },
 });

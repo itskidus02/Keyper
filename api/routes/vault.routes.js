@@ -6,6 +6,7 @@ import {
   deleteVaultEntry,
   getUserVaults,
   getVaultById,
+  getDashboardStats,
 } from '../controllers/vault.controller.js';
 import { verifyToken } from '../utils/verifyUser.js';
 
@@ -26,5 +27,7 @@ router.delete('/delete/:id', verifyToken, deleteVault);
 
 // Delete an entry from a vault
 router.delete('/:vaultId/entries/:entryId', verifyToken, deleteVaultEntry);
+router.get('/dashboard-stats' , verifyToken, getDashboardStats);
+
 
 export default router;

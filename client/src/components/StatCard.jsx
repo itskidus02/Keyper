@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { Card, CardHeader, CardContent } from './ui/card';
 
-const StatCard = ({ title, value, change, icon }) => {
+const StatCard = ({ title, value = 0, change = 0, icon }) => {
   const isPositive = change >= 0;
 
   return (

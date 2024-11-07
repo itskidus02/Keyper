@@ -1,27 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchDashboardStats } from '../../../../redux/vault/vaultSlice';
 import StatCard from '@/components/StatCard';
 import { Vault, KeyRound, Fingerprint, Lock } from 'lucide-react';
 
 const Dashboard = () => {
-  // In a real app, these would come from your API
-  const stats = {
-    vaults: {
-      total: 147,
-      change: 12.5
-    },
-    entries: {
-      total: 1834,
-      change: 8.2
-    },
-    seeds: {
-      total: 456,
-      change: -2.3
-    },
-    passwords: {
-      total: 1378,
-      change: 15.7
+  const dispatch = useDispatch();
+  const dashboardStats = useSelector((state) => state.vault.dashboardStats);
+
+  useEffect(() => {
+    if (!dashboardStats) {
+      dispatch(fetchDashboardStats());
     }
-  };
+  }, [dashboardStats, dispatch]);
+
+  if (!dashboardStats) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className=" ">
@@ -34,32 +29,32 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
             title="Total Vaults"
-            value={stats.vaults.total}
-            change={stats.vaults.change}
+            value={dashboardStats.vaults}
+            change={12.5} // Placeholder for now
             icon={<Vault className="w-5 h-5 text-indigo-600" />}
           />
           <StatCard
             title="Total Entries"
-            value={stats.entries.total}
-            change={stats.entries.change}
+            value={dashboardStats.entries}
+            change={8.2} // Placeholder for now
             icon={<KeyRound className="w-5 h-5 text-indigo-600" />}
           />
           <StatCard
             title="Total Seeds"
-            value={stats.seeds.total}
-            change={stats.seeds.change}
+            value={dashboardStats.seeds}
+            change={-2.3} // Placeholder for now
             icon={<Fingerprint className="w-5 h-5 text-indigo-600" />}
           />
           <StatCard
             title="Total Passwords"
-            value={stats.passwords.total}
-            change={stats.passwords.change}
+            value={dashboardStats.passwords}
+            change={15.7} // Placeholder for now
             icon={<Lock className="w-5 h-5 text-indigo-600" />}
           />
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;

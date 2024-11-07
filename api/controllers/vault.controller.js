@@ -164,3 +164,43 @@ export const getVaultById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// In vault.controller.js
+
+export const getDashboardStats = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Count total vaults
+    const vaultCount = await Vault.countDocuments({ user: userId });
+
+    // Aggregate entry counts
+    const [entryCountResult] = await Vault.aggregate([
+      { $match: { user: userId } },
+      { $unwind: "$entries" },
+      {
+        $group: {
+          _id: null,
+          totalEntries: { $sum: 1 },
+          totalSeeds: { $sum: { $cond: [{ $eq: ["$entries.type", "seed"] }, 1, 0] } },
+          totalPasswords: { $sum: { $cond: [{ $eq: ["$entries.type", "password"] }, 1, 0] } }
+        }
+      }
+    ]);
+
+    // Set defaults if no entries are found
+    const entryCount = entryCountResult?.totalEntries || 0;
+    const seedCount = entryCountResult?.totalSeeds || 0;
+    const passwordCount = entryCountResult?.totalPasswords || 0;
+
+    res.json({
+      vaults: vaultCount,
+      entries: entryCount,
+      seeds: seedCount,
+      passwords: passwordCount
+    });
+    
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
