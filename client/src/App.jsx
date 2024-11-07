@@ -14,6 +14,7 @@ import Sidebar from "./pages/private/Admin/Components/Sidebar";
 import PassGen from "./pages/private/Admin/Pages/PassGen";
 import PassHealth from "./pages/private/Admin/Pages/PassHealth";
 import VaultPage from "./pages/private/Admin/Pages/VaultPage";
+import Dashboard from "./pages/private/Admin/Pages/Dashboard";
 
 function AppContent() {
   const location = useLocation();
@@ -56,6 +57,7 @@ function AppContent() {
         <Route element={<PrivateRoute />}>
           {/* Admin Routes */}
           <Route path="/admin" element={<Sidebar />}>
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="profile" element={<Profile />} />
             <Route path="passgen" element={<PassGen />} />
             <Route path="passhealth" element={<PassHealth />} />

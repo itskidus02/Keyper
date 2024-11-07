@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteVault, createVault } from '../redux/vault/vaultSlice';
-import { Wrench, Settings2, Plus, Trash, ChevronDown, ChevronUp, Vault } from "lucide-react";
+import { Wrench, Settings2, Plus, Trash, ChevronDown, ChevronUp, Vault, LayoutDashboard } from "lucide-react";
 import logo from "../assets/images/logo.png";
 import wlogo from "../assets/images/wlogo.png";
 import { NavUser } from "@/components/nav-user";
@@ -24,7 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 
 export function AppSidebar({ ...props }) {
-  const { resolvedTheme } = useTheme(); // Get the current theme (light or dark)
+  const { resolvedTheme } = useTheme();
   const currentLogo = resolvedTheme === "dark" ? wlogo : logo;
   const dispatch = useDispatch();
   const vaults = useSelector((state) => state.vault.vaults); 
@@ -117,16 +117,27 @@ export function AppSidebar({ ...props }) {
         </Popover>
       </SidebarHeader>
       <SidebarContent className="p-4 space-y-1">
+        {/* Dashboard Section */}
+        <div className="flex items-center w-full">
+          <button
+            onClick={() => navigate('/admin/dashboard')}
+            className="flex items-center gap-3 w-full  p-2 rounded-md transition-colors group"
+          >
+            <LayoutDashboard className="h-6 w-6 -ml-3 flex-shrink-0" />
+            <span className="font-semibold group-data-[collapsible=icon]:hidden">Dashboard</span>
+          </button>
+        </div>
+
         {/* Vaults Section */}
         <div>
           <div onClick={() => setIsVaultCollapsed(!isVaultCollapsed)} className="flex items-center justify-between w-full cursor-pointer">
             <div className="flex items-center gap-3 font-semibold">
               <Vault className="h-6 -ml-1 w-6" />
-              <h4>Vaults</h4>
+              <h4 className="group-data-[collapsible=icon]:hidden">Vaults</h4>
             </div>
-            {isVaultCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            {isVaultCollapsed ? <ChevronDown className="h-4 w-4 group-data-[collapsible=icon]:hidden" /> : <ChevronUp className="h-4 w-4 group-data-[collapsible=icon]:hidden" />}
           </div>
-          <div ref={vaultRef} style={getCollapseStyle(isVaultCollapsed, vaultRef)} className="mt-2 space-y-2">
+          <div ref={vaultRef} style={getCollapseStyle(isVaultCollapsed, vaultRef)} className="mt-2 space-y-2 group-data-[collapsible=icon]:hidden">
             {vaults.map((vault) => (
               <div key={vault._id} className="flex ml-8 text-sm justify-between items-center">
                 <button className="transition-all w-full justify-start text-left mr-9 m-1 hover:text-gray-400" onClick={() => navigate(`/admin/vault/${vault._id}`)}>{vault.name.slice(0,13)}</button>
@@ -151,12 +162,12 @@ export function AppSidebar({ ...props }) {
             >
               <div className="flex items-center gap-3 font-semibold">
                 <section.icon className="h-6 -ml-1 w-6" />
-                <h4>{section.title}</h4>
+                <h4 className="group-data-[collapsible=icon]:hidden">{section.title}</h4>
               </div>
               {(section.title === "Tools" && isToolsCollapsed) || (section.title === "Settings" && isSettingsCollapsed) ? (
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-4 w-4 group-data-[collapsible=icon]:hidden" />
               ) : (
-                <ChevronUp className="h-4 w-4" />
+                <ChevronUp className="h-4 w-4 group-data-[collapsible=icon]:hidden" />
               )}
             </div>
             <div
@@ -165,13 +176,13 @@ export function AppSidebar({ ...props }) {
                 section.title === "Tools" ? isToolsCollapsed : isSettingsCollapsed,
                 section.title === "Tools" ? toolsRef : settingsRef
               )}
-              className="mt-2 ml-8 space-y-2"
+              className="mt-2 ml-8 space-y-2 group-data-[collapsible=icon]:hidden"
             >
               {section.items.map((item) => (
                 <button
                   key={item.url}
                   onClick={() => navigate(item.url)}
-                  className="text-sm w-full text-left transition-all  justify-start  mr-9 m-1 hover:text-gray-400"
+                  className="text-sm w-full text-left transition-all justify-start mr-9 m-1 hover:text-gray-400"
                 >
                   {item.title}
                 </button>
