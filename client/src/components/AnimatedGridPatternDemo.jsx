@@ -19,7 +19,7 @@ export function AnimatedGridPatternDemo() {
           effortless password management for ultimate peace of mind.
         </p>
         <div className="flex flex-col justify-center mt-[2rem] sm:flex-row gap-4 w-full sm:w-auto animate-in fade-in slide-in-from-bottom-16 duration-700">
-        <Link to="/admin">
+        <Link to="/admin/dashboard">
             <Button
               variant="gooeyLeft"
               size="lg"

@@ -1,6 +1,6 @@
 import Vault from '../models/vault.model.js';
 import crypto from 'crypto';
-
+import mongoose from 'mongoose';
 const encryptData = (text, key) => {
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key, 'hex'), iv);
@@ -169,8 +169,7 @@ export const getVaultById = async (req, res) => {
 
 export const getDashboardStats = async (req, res) => {
   try {
-    const userId = req.user.id;
-
+    const userId = new mongoose.Types.ObjectId(req.user.id);
     // Count total vaults
     const vaultCount = await Vault.countDocuments({ user: userId });
 
@@ -192,7 +191,12 @@ export const getDashboardStats = async (req, res) => {
     const entryCount = entryCountResult?.totalEntries || 0;
     const seedCount = entryCountResult?.totalSeeds || 0;
     const passwordCount = entryCountResult?.totalPasswords || 0;
-
+    console.log({
+      vaults: vaultCount,
+      entries: entryCount,
+      seeds: seedCount,
+      passwords: passwordCount
+    });
     res.json({
       vaults: vaultCount,
       entries: entryCount,
