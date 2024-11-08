@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchDashboardStats } from '../../../../redux/vault/vaultSlice';
 import StatCard from '@/components/StatCard';
 import { Vault, KeyRound, Fingerprint, Lock, RefreshCcwIcon } from 'lucide-react';
+import { XarChart } from '@/components/XarChart';
+import { Button } from '@/components/ui/button';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -28,13 +30,13 @@ const Dashboard = () => {
             <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
             <p className="text-gray-500 mt-1">Monitor your vault statistics</p>
           </div>
-          <button 
+          <Button 
             onClick={refreshData}
-            className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+            className="p-2 flex items-center gap-2"
           >
             <RefreshCcwIcon className="w-5 h-5" />
             Refresh
-          </button>
+          </Button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -64,6 +66,8 @@ const Dashboard = () => {
           />
         </div>
       </div>
+      <XarChart/>
+      
     </div>
   );
 };
