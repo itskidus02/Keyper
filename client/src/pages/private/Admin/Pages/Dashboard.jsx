@@ -2,17 +2,19 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDashboardStats } from '../../../../redux/vault/vaultSlice';
 import StatCard from '@/components/StatCard';
-import { Vault, KeyRound, Fingerprint, Lock } from 'lucide-react';
+import { Vault, KeyRound, Fingerprint, Lock, RefreshCcwIcon } from 'lucide-react';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const dashboardStats = useSelector((state) => state.vault.dashboardStats);
 
   useEffect(() => {
-    if (!dashboardStats) {
-      dispatch(fetchDashboardStats());
-    }
-  }, [dashboardStats, dispatch]);
+    dispatch(fetchDashboardStats());
+  }, [dispatch]);
+
+  const refreshData = () => {
+    dispatch(fetchDashboardStats());
+  };
 
   if (!dashboardStats) {
     return <div>Loading...</div>;
@@ -21,9 +23,18 @@ const Dashboard = () => {
   return (
     <div className=" ">
       <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-1">
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="text-gray-500 mt-1">Monitor your vault statistics</p>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+            <p className="text-gray-500 mt-1">Monitor your vault statistics</p>
+          </div>
+          <button 
+            onClick={refreshData}
+            className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+          >
+            <RefreshCcwIcon className="w-5 h-5" />
+            Refresh
+          </button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
