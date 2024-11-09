@@ -4,9 +4,9 @@ import { fetchDashboardStats } from '../../../../redux/vault/vaultSlice';
 import StatCard from '@/components/StatCard';
 import { Vault, KeyRound, Fingerprint, Lock, RefreshCcwIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Archart } from '@/components/Archart';
-import { XarChart } from '@/components/XarChart';
-import { MulChart } from '@/components/MulChart';
+import {  VaultChart } from '@/components/VaultChart';
+import { EntryChart } from '@/components/EntryChart';
+import {  SeedPassChart } from '@/components/SeedPassChart';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -67,9 +67,11 @@ const Dashboard = () => {
             icon={<Lock className="w-5 h-5 text-indigo-600" />}
           />
         </div>
-        <Archart/>
-        <XarChart />
-        <MulChart/>
+        <VaultChart/>
+        <div className='lg:grid lg:grid-cols-2'>
+        <EntryChart />
+        <SeedPassChart/>
+        </div>
       </div>
       
     </div>
