@@ -2,6 +2,8 @@ import { cn } from "@/lib/utils";
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
+import Features from "./Features";
+import Footer from "./Footer";
 
 export function AnimatedGridPatternDemo() {
   return (
@@ -40,6 +42,8 @@ export function AnimatedGridPatternDemo() {
           </Link>
 
         </div>
+        <Features/>
+        <Footer/>
       </div>
       <AnimatedGridPattern
         numSquares={900}
