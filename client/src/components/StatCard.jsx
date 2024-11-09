@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
-import { Card, CardHeader, CardContent, CardTitle } from './ui/card';
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 
 const StatCard = ({ title, value = 0, change = 0, icon, refreshData }) => {
   const isPositive = change >= 0;
@@ -18,7 +18,7 @@ const StatCard = ({ title, value = 0, change = 0, icon, refreshData }) => {
       </CardHeader>
       <CardContent>
         <div className="flex gap-2 flex-col">
-          <span className="text-4xl ml-1 font-bold">{value.toLocaleString()}</span>
+          <span className="text-4xl ml-1 text-muted-foreground font-bold">{value.toLocaleString()}</span>
       
         </div>
       </CardContent>
