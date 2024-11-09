@@ -5,6 +5,8 @@ import StatCard from '@/components/StatCard';
 import { Vault, KeyRound, Fingerprint, Lock, RefreshCcwIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Archart } from '@/components/Archart';
+import { XarChart } from '@/components/XarChart';
+import { MulChart } from '@/components/MulChart';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -66,6 +68,8 @@ const Dashboard = () => {
           />
         </div>
         <Archart/>
+        <XarChart />
+        <MulChart/>
       </div>
       
     </div>
