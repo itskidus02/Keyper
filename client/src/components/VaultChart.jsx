@@ -17,18 +17,18 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "Ju", desktop: 214, mobile: 140 },
-  { month: "Jul", desktop: 214, mobile: 140 },
-  { month: "au", desktop: 214, mobile: 140 },
-  { month: "sep", desktop: 214, mobile: 140 },
-  { month: "oct", desktop: 214, mobile: 140 },
-  { month: "no", desktop: 214, mobile: 140 },
-  { month: "dec", desktop: 214, mobile: 140 },
+  { month: "January", desktop: 186 },
+  { month: "February", desktop: 300 },
+  { month: "March", desktop: 220 },
+  { month: "April", desktop: 790 },
+  { month: "May", desktop: 230 },
+  { month: "Ju", desktop: 214},
+  { month: "Jul", desktop: 240 },
+  { month: "au", desktop: 210 },
+  { month: "sep", desktop: 314},
+  { month: "oct", desktop: 114},
+  { month: "no", desktop: 224 },
+  { month: "dec", desktop: 414},
 ]
 
 const chartConfig = {
@@ -96,14 +96,7 @@ export function VaultChart() {
                 />
               </linearGradient>
             </defs>
-            <Area
-              dataKey="mobile"
-              type="natural"
-              fill="url(#fillMobile)"
-              fillOpacity={0.4}
-              stroke="var(--color-mobile)"
-              stackId="a"
-            />
+          
             <Area
               dataKey="desktop"
               type="natural"
