@@ -178,8 +178,25 @@ export const getVaultById = async (req, res) => {
 export const getDashboardStats = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.user.id);
+
     // Count total vaults
     const vaultCount = await Vault.countDocuments({ user: userId });
+
+    // Aggregate daily vault creation counts
+    const vaultsByDay = await Vault.aggregate([
+      { $match: { user: userId } },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
+    ]);
 
     // Aggregate entry counts
     const [entryCountResult] = await Vault.aggregate([
@@ -199,13 +216,13 @@ export const getDashboardStats = async (req, res) => {
       },
     ]);
 
-    // Set defaults if no entries are found
     const entryCount = entryCountResult?.totalEntries || 0;
     const seedCount = entryCountResult?.totalSeeds || 0;
     const passwordCount = entryCountResult?.totalPasswords || 0;
 
     res.json({
       vaults: vaultCount,
+      vaultsByDay,
       entries: entryCount,
       seeds: seedCount,
       passwords: passwordCount,
@@ -214,3 +231,5 @@ export const getDashboardStats = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
