@@ -1,13 +1,11 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -16,38 +14,55 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
-  label: {
-    color: "hsl(var(--background))",
-  },
-} 
+import { useEffect, useState } from "react"
 
 export function EntryChart() {
+  const [chartData, setChartData] = useState([])
+
+  useEffect(() => {
+    // Fetch dashboard stats
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/vaults/dashboard-stats") // Adjust API path as necessary
+        const data = await response.json()
+
+        // Convert the daily entries data for chart
+        const formattedData = data.entriesByDay.map((item) => ({
+          date: new Date(item._id.year, item._id.month - 1, item._id.day).toLocaleDateString(
+            "default",
+            { month: "short", day: "numeric" }
+          ),
+          entries: item.count,
+        }))
+
+        setChartData(formattedData)
+      } catch (error) {
+        console.error("Error fetching chart data:", error)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  const chartConfig = {
+    entries: {
+      label: "Entries",
+      color: "hsl(var(--chart-1))",
+    },
+    label: {
+      color: "hsl(var(--background))",
+    },
+  }
+
   return (
     <Card className="mt-[0rem]">
       <CardHeader>
         <CardTitle>Total entries from all vaults</CardTitle>
-        <CardDescription>All time stats</CardDescription>
+        <CardDescription>All time stats by day</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer className="h-[15rem] w-full"  config={chartConfig}>
+        <ChartContainer className="h-[15rem] w-full" config={chartConfig}>
           <BarChart
             accessibilityLayer
             data={chartData}
@@ -58,34 +73,32 @@ export function EntryChart() {
           >
             <CartesianGrid horizontal={false} />
             <YAxis
-              dataKey="month"
+              dataKey="date"
               type="category"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-              hide
             />
-            <XAxis dataKey="desktop" type="number" hide />
+            <XAxis dataKey="entries" type="number" />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
             />
             <Bar
-              dataKey="desktop"
+              dataKey="entries"
               layout="vertical"
-              fill="var(--color-desktop)"
+              fill="var(--color-entries)"
               radius={4}
             >
               <LabelList
-                dataKey="month"
+                dataKey="date"
                 position="insideLeft"
                 offset={8}
                 className="fill-[--color-label]"
                 fontSize={12}
               />
               <LabelList
-                dataKey="desktop"
+                dataKey="entries"
                 position="right"
                 offset={8}
                 className="fill-foreground"
@@ -95,7 +108,6 @@ export function EntryChart() {
           </BarChart>
         </ChartContainer>
       </CardContent>
-     
     </Card>
   )
 }

@@ -197,6 +197,21 @@ export const getDashboardStats = async (req, res) => {
       },
       { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
     ]);
+    const entriesByDay = await Vault.aggregate([
+      { $match: { user: userId } },
+      { $unwind: "$entries" },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$entries.createdAt" },
+            month: { $month: "$entries.createdAt" },
+            day: { $dayOfMonth: "$entries.createdAt" },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
+    ]);
 
     // Aggregate entry counts
     const [entryCountResult] = await Vault.aggregate([
@@ -223,6 +238,8 @@ export const getDashboardStats = async (req, res) => {
     res.json({
       vaults: vaultCount,
       vaultsByDay,
+      entriesByDay,
+      
       entries: entryCount,
       seeds: seedCount,
       passwords: passwordCount,
