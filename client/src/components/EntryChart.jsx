@@ -78,8 +78,9 @@ export function EntryChart() {
               tickLine={false}
               tickMargin={10}
               axisLine={false}
+              tick={false}
             />
-            <XAxis dataKey="entries" type="number" />
+            <XAxis dataKey="entries" type="number"  />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
