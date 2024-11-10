@@ -2,6 +2,9 @@ import { cn } from "@/lib/utils";
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
+import Features from "./Features";
+import Footer from "./Footer";
+import HowItWorks from "./HowItWorks";
 
 export function AnimatedGridPatternDemo() {
   return (
@@ -28,7 +31,7 @@ export function AnimatedGridPatternDemo() {
               Dashboard
             </Button>
           </Link>
-          <Link to="/admin">
+          <a href="#how">
 
           <Button
             size="lg"
@@ -37,9 +40,12 @@ export function AnimatedGridPatternDemo() {
           >
             See How It Works
           </Button>
-          </Link>
+          </a>
 
         </div>
+        <Features/>
+        <HowItWorks/>
+        <Footer/>
       </div>
       <AnimatedGridPattern
         numSquares={900}
