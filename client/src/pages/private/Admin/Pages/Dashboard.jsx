@@ -29,7 +29,7 @@ const Dashboard = () => {
       <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-1">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900">Dashboard Overview</h1>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h1>
             <p className="text-gray-500 mt-1">Monitor your vault statistics</p>
           </div>
           <Button 
@@ -46,25 +46,25 @@ const Dashboard = () => {
             title="Total Vaults"
             value={dashboardStats.vaults}
             change={12.5} // Placeholder for now
-            icon={<Vault className="w-5 h-5 text-indigo-600" />}
+            icon={<Vault className="w-5 h-5 " />}
           />
           <StatCard
             title="Total Entries"
             value={dashboardStats.entries}
             change={8.2} // Placeholder for now
-            icon={<KeyRound className="w-5 h-5 text-indigo-600" />}
+            icon={<KeyRound className="w-5 h-5 " />}
           />
           <StatCard
             title="Total Seeds"
             value={dashboardStats.seeds}
             change={-2.3} // Placeholder for now
-            icon={<Fingerprint className="w-5 h-5 text-indigo-600" />}
+            icon={<Fingerprint className="w-5 h-5 " />}
           />
           <StatCard
             title="Total Passwords"
             value={dashboardStats.passwords}
             change={15.7} // Placeholder for now
-            icon={<Lock className="w-5 h-5 text-indigo-600" />}
+            icon={<Lock className="w-5 h-5 " />}
           />
         </div>
         <VaultChart/>
