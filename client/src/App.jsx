@@ -4,7 +4,6 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import { store } from "./redux/store";
 import { fetchVaults } from "./redux/vault/vaultSlice";
 import Home from "./pages/public/Home";
-import About from "./pages/public/About";
 import SignIn from "./pages/public/SignIn";
 import SignUp from "./pages/public/SignUp";
 import Profile from "./pages/private/Admin/Pages/Profile";
@@ -49,7 +48,6 @@ function AppContent() {
       {!isAdminRoute && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
 
