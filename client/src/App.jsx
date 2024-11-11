@@ -14,6 +14,7 @@ import PassGen from "./pages/private/Admin/Pages/PassGen";
 import PassHealth from "./pages/private/Admin/Pages/PassHealth";
 import VaultPage from "./pages/private/Admin/Pages/VaultPage";
 import Dashboard from "./pages/private/Admin/Pages/Dashboard";
+import NotFound from "./components/NotFound";
 
 function AppContent() {
   const location = useLocation();
@@ -62,6 +63,7 @@ function AppContent() {
             <Route path="vault/:vaultId" element={<VaultPage />} />
           </Route>
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
