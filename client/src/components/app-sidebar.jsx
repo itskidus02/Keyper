@@ -65,7 +65,7 @@ export function AppSidebar({ ...props }) {
 
   const data = {
     user: { name: "shadcn", email: "m@example.com", avatar: "/avatars/shadcn.jpg" },
-    teams: [{ name: "LockBox", logo: currentLogo, plan: "Enterprise", url: "/" }],
+    teams: [{ name: "Keyper", logo: currentLogo, plan: "Enterprise", url: "/" }],
     navMain: [
       {
         title: "Tools",

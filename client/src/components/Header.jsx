@@ -14,7 +14,7 @@ export default function Header() {
       <div className="flex h-14 items-center justify-between max-w-6xl mx-auto px-4">
         <Link className="flex items-center gap-3" to="/">
           <img src={currentLogo} className="w-10 h-8" alt="LockBox Logo" />
-          <h1 className="font-bold">Secura</h1>
+          <h1 className="font-bold">Keyper</h1>
         </Link>
 
         <div className="flex items-center gap-4">
