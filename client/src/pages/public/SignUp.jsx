@@ -41,7 +41,7 @@ export default function SignUp() {
     }
   };
   return (
-      <Card className="w-full mt-8 mx-auto max-w-md">
+      <Card className="w-full ring-1 dark:ring-zinc-700 ring-zinc-200 mt-8 mx-auto max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">Sign Up</CardTitle>
           <CardDescription className="text-center">Join us if it is your first time</CardDescription>

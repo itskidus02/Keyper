@@ -46,8 +46,9 @@ export default function SignIn() {
 
   return (
     <>
+    <div className=""> 
       <Toaster position="top-right" richColors />
-      <Card className="w-full max-w-md mx-auto mt-8">
+      <Card className="w-full ring-1 dark:ring-zinc-700 ring-zinc-200  max-w-md mx-auto mt-8">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
           <CardDescription className="text-center">Enter your credentials to access your account</CardDescription>
@@ -88,6 +89,7 @@ export default function SignIn() {
           </div>
         </CardFooter>
       </Card>
+      </div>
     </>
   );
 }
