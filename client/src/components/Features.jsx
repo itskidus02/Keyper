@@ -14,14 +14,10 @@ export default function Features() {
     },
     {
       icon: RefreshCw,
-      title: "Auto-Fill & Sync",
-      description: "Automatically fill in passwords across all your devices with real-time syncing."
+      title: "Pass-Health checker",
+      description: "Check if your passwords are attack resistant."
     },
-    {
-      icon: Share2,
-      title: "Secure Sharing",
-      description: "Safely share passwords with family members or team colleagues."
-    }
+   
   ]
 
   return (
@@ -30,7 +26,7 @@ export default function Features() {
         <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">
           Why Choose Our Password Manager?
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <div key={index} className="flex flex-col items-center text-center">
               <div className="p-4 bg-white dark:bg-gray-800 rounded-full mb-4">
