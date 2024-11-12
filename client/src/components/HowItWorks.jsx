@@ -3,15 +3,21 @@ import React from "react";
 import { StickyScroll } from "../components/ui/sticky-scroll-reveal";
 // import Image from "next/image";
 import logo from "../../src/assets/images/h.png"
+import one from "../../src/assets/images/1.png"
+import two from "../../src/assets/images/2.png"
+import three from "../../src/assets/images/3.png"
+import four from "../../src/assets/images/4.png"
+import five from "../../src/assets/images/5.png"
+import six from "../../src/assets/images/6.png"
 const content = [
   {
-    title: "Collaborative Editing",
+    title: "Sign in to keyper",
     description:
-      "Work together in real time with your team, clients, and stakeholders. Collaborate on documents, share ideas, and make decisions quickly. With our platform, you can streamline your workflow and increase productivity.",
+      "if you are new to our site join us by signing up.",
       content: (
         <div className="h-full w-full  flex items-center justify-center">
           <img
-            src={logo}
+            src={five}
             width={300}
             height={300}
             className="h-full w-full object-cover"
@@ -20,13 +26,13 @@ const content = [
       ),
   },
   {
-    title: "Real time changes",
+    title: "Navigate to Dashboard",
     description:
-      "See changes as they happen. With our platform, you can track every modification in real time. No more confusion about the latest version of your project. Say goodbye to the chaos of version control and embrace the simplicity of real-time updates.",
+      "Create new Vaults by clicking the button. you can create as many vaults as you like.",
     content: (
       <div className="h-full w-full  flex items-center justify-center">
         <img
-          src={logo}
+          src={six}
           width={300}
           height={300}
           className="h-full w-full object-cover"
@@ -35,13 +41,13 @@ const content = [
     ),
   },
   {
-    title: "Version control",
+    title: "Create Passwords",
     description:
-      "Experience real-time updates and never stress about version control again. Our platform ensures that you're always working on the most recent version of your project, eliminating the need for constant manual updates. Stay in the loop, keep your team aligned, and maintain the flow of your work without any interruptions.",
+      "Other than creating passwords, you can create wallet seed phraases with standard word length. and copy them when they are needed.",
       content: (
         <div className="h-full w-full  flex items-center justify-center">
           <img
-            src={logo}
+            src={four}
             width={300}
             height={300}
             className="h-full w-full object-cover"
@@ -50,13 +56,28 @@ const content = [
       ),
   },
   {
-    title: "Running out of content",
+    title: "The Vault page",
     description:
-      "Experience real-time updates and never stress about version control again. Our platform ensures that you're always working on the most recent version of your project, eliminating the need for constant manual updates. Stay in the loop, keep your team aligned, and maintain the flow of your work without any interruptions.",
+      "Navigate through the passwords and seeds you created.",
       content: (
         <div className="h-full w-full  flex items-center justify-center">
           <img
-            src={logo}
+            src={three}
+            width={300}
+            height={300}
+            className="h-full w-full object-cover"
+            alt="linear board demo" />
+        </div>
+      ),
+  },
+  {
+    title: "Dashboard statistics",
+    description:
+      "Manage your statistics like total vaults and total passwords.",
+      content: (
+        <div className="h-full w-full  flex items-center justify-center">
+          <img
+            src={one}
             width={300}
             height={300}
             className="h-full w-full object-cover"
