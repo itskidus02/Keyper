@@ -158,7 +158,7 @@ export default function Profile() {
   }
 
   return (
-    <Card className="max-w-lg mx-auto">
+    <Card className="max-w-lg h-screen mx-auto">
             <Toaster position="bottom-right" richColors />
 
       <CardHeader>
