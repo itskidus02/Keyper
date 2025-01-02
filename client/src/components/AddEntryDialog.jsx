@@ -25,7 +25,34 @@ export function AddEntryDialog({ onSave }) {
     newWords[index] = value;
     setWords(newWords);
   };
+  const handlePaste = (e, index) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData("text");
+    const pastedWords = pastedText.trim().split(/\s+/);
 
+    // If pasted text matches the expected word count, fill all inputs
+    if (pastedWords.length === wordCount) {
+      setWords(pastedWords);
+      return;
+    }
+
+    // If pasting a single word, just update that input
+    if (pastedWords.length === 1) {
+      handleWordChange(index, pastedWords[0]);
+      return;
+    }
+
+    // If pasting multiple words but not matching word count, fill from current position
+    const remainingSlots = wordCount - index;
+    const wordsToFill = pastedWords.slice(0, remainingSlots);
+    const newWords = [...words];
+    wordsToFill.forEach((word, i) => {
+      if (index + i < wordCount) {
+        newWords[index + i] = word;
+      }
+    });
+    setWords(newWords);
+  };
   const handleWordCountChange = (count) => {
     setWordCount(Number(count));
     setWords(Array(Number(count)).fill(""));
@@ -149,6 +176,7 @@ export function AddEntryDialog({ onSave }) {
                       id={`word-${index}`}
                       value={word}
                       onChange={(e) => handleWordChange(index, e.target.value)}
+                      onPaste={(e) => handlePaste(e, index)} 
                       placeholder={`Word ${index + 1}`}
                       className="text-sm"
                     />
